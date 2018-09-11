@@ -1,6 +1,6 @@
 from json import dumps
 from django.contrib.gis.geos import GeometryCollection, GEOSGeometry, Polygon
-from functional import ramda as R
+from ..functional import ramda as R
 
 def geometry_from_geojson(geojson):
     """
