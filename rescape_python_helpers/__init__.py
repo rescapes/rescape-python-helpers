@@ -37,6 +37,9 @@ from .functional.ramda import (
     prop_or
 )
 
+# Easy access ro all ramda and pyramda methods
+from .functional import ramda
+
 from .geospatial.geometry_helpers import (
     ewkt_from_feature,
     geometrycollection_from_featurecollection,
