@@ -42,6 +42,11 @@ Upload package:
 
 ```bash
 twine upload dist/*
+```
+
+To do everything at once
+
+```bash
 git commit . -m "Version update" && git push && bumpversion --current-version {look in setup.py} patch setup.py && python3 setup.py clean sdist bdist_wheel && twine upload dist/*
 ```
 
