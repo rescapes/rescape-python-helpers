@@ -19,6 +19,7 @@ def geometry_from_feature(feature):
     """
     return geometry_from_geojson(feature['geometry'])
 
+
 def ewkt_from_feature(feature):
     return geometry_from_feature(feature).ewkt
 
