@@ -49,5 +49,5 @@ from .geospatial.geometry_helpers import (
 
 __all__ = [
     'functional.ramda',
-    'geometry_helpers.geometry_helpers'
+    'geospatial.geometry_helpers'
 ]
