@@ -4,6 +4,7 @@ from deepmerge import Merger
 from pyramda import *
 from json import dumps
 
+
 @curry
 def prop(key, dct_or_obj):
     """
@@ -12,9 +13,19 @@ def prop(key, dct_or_obj):
     :param dct_or_obj:
     :return:
     """
-    return (isinstance(dict, dct_or_obj) and has(key, dct_or_obj) and getitem(key, dct_or_obj) or
-            (not isinstance(dict, dct_or_obj) and hasattr(dct_or_obj, key) and (getattr(key, dct_or_obj)))
-            )
+    # Note that hasattr is a builtin and getattr is a ramda function, hence the different arg position
+    if isinstance(dict, dct_or_obj):
+        if has(key, dct_or_obj):
+            return dct_or_obj[key]
+        else:
+            raise Exception("No key %s found for dict %s" % (key, dct_or_obj))
+    elif isinstance(object, dct_or_obj):
+        if hasattr(dct_or_obj, key):
+            return  getattr(key, dct_or_obj)
+        else:
+            raise Exception("No key %s found for objects %s" % (key, dct_or_obj))
+    else:
+        raise Exception("%s is neither a dict nor objects" % dct_or_obj)
 
 @curry
 def filter_dict(f, dct):
@@ -47,9 +58,16 @@ def prop_or(default, key, dct_or_obj):
     :return:
     """
     # Note that hasattr is a builtin and getattr is a ramda function, hence the different arg position
-    return (isinstance(dict, dct_or_obj) and has(key, dct_or_obj) and dct_or_obj[key]) or \
-           (not isinstance(dict, dct_or_obj) and hasattr(dct_or_obj, key) and (getattr(key, dct_or_obj))) or \
-           default
+    if isinstance(dict, dct_or_obj):
+        value = dct_or_obj[key] if has(key, dct_or_obj) else default
+    elif isinstance(object, dct_or_obj):
+        value = getattr(key, dct_or_obj) if hasattr(dct_or_obj, key) else default
+    else:
+        value = default
+    # 0 and False are ok, None defaults
+    if value == None:
+        return default
+    return value
 
 
 @curry
@@ -144,6 +162,22 @@ def isint(value):
 
 
 @curry
+def item_path(keys, dict):
+    """
+        Upgrade pyramda item_path to deal with objects
+    :param keys: List of keys into the dict or obj
+    :param dict: A dict or obj with attributes containing deep dicts and/or objs
+    :return:
+    """
+    if not keys:
+        raise ValueError("Expected at least one key, got {0}".format(keys))
+    current_value = dict
+    for key in keys:
+        current_value = prop(key, current_value)
+    return current_value
+
+
+@curry
 def item_str_path(keys, dct):
     """
         Given a string of path segments separated by ., splits them into an array. Int strings are converted
@@ -153,6 +187,19 @@ def item_str_path(keys, dct):
     :return: The resolved value or an error. E.g. for above the result would be b
     """
     return item_path(map(lambda segment: int(segment) if isint(segment) else segment, keys.split('.')), dct)
+
+
+@curry
+def item_str_path_or(default, keys, dct):
+    """
+        Given a string of path segments separated by ., splits them into an array. Int strings are converted
+        to numbers to serve as an array index
+    :param default: Value if any part yields None or undefined
+    :param keys: e.g. 'foo.bar.1.goo'
+    :param dct: e.g. dict(foo=dict(bar=[dict(goo='a'), dict(goo='b')])
+    :return: The resolved value or an error. E.g. for above the result would be b
+    """
+    return item_path_or(default, map(lambda segment: int(segment) if isint(segment) else segment, keys.split('.')), dct)
 
 
 @curry
@@ -282,6 +329,7 @@ def map_with_obj_to_values(f, dct):
     """
     return list(values(map_with_obj(f, dct)))
 
+
 @curry
 def map_key_values(f, dct):
     """
@@ -319,14 +367,15 @@ def merge_dicts(*dict_args):
     return result
 
 
-def merge_deep(dct1, dct2):
+def merge_deep(dct1, dct2, merger=None):
     """
         Deep merge by this spec below
     :param dct1:
     :param dct2:
+    :param merger Optional merger
     :return:
     """
-    my_merger = Merger(
+    my_merger = merger or Merger(
         # pass in a list of tuples,with the
         # strategies you are looking to apply
         # to each type.
@@ -350,12 +399,13 @@ def merge_deep_all(dcts):
     :param dcts: 
     :return: 
     """""
-    
+
     return reduce(
         lambda accum, dct: merge_deep(accum, dct),
         dict(),
         dcts
     )
+
 
 @curry
 def merge(dct1, dct2):

@@ -1,7 +1,6 @@
 from snapshottest import TestCase
 from . import ramda as R
 
-
 class TestRamda(TestCase):
 
     def test_filter_dict(self):
