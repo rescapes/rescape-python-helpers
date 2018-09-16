@@ -25,5 +25,16 @@ def ewkt_from_feature(feature):
 
 
 # https://gis.stackexchange.com/questions/177254/create-a-geosgeometry-from-a-featurecollection-in-geodango
-def geometrycollection_from_featurecollection(feature_collection):
+def geometrycollection_from_feature_collection(feature_collection):
     return GeometryCollection(tuple(R.map(geometry_from_feature, feature_collection['features'])))
+
+
+def ewkt_from_feature_collection(feature_collection):
+    """
+        Like geometrycollection_from_featurecollection but calls ewkt to get the ewkt
+        string.
+    :param feature_collection:
+    :return:
+    """
+    return geometrycollection_from_feature_collection(feature_collection).ewkt
+

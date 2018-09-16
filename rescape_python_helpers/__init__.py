@@ -42,7 +42,7 @@ from .functional import ramda
 
 from .geospatial.geometry_helpers import (
     ewkt_from_feature,
-    geometrycollection_from_featurecollection,
+    geometrycollection_from_feature_collection,
     geometry_from_geojson,
     geometry_from_feature,
 )
