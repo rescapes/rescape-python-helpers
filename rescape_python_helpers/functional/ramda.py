@@ -19,6 +19,11 @@ def prop(key, dct_or_obj):
             return dct_or_obj[key]
         else:
             raise Exception("No key %s found for dict %s" % (key, dct_or_obj))
+    elif isinstance(list, dct_or_obj):
+        if isint(key):
+            return dct_or_obj[key]
+        else:
+            raise Exception("Key %s not expected for list type: %s" % (key, dct_or_obj))
     elif isinstance(object, dct_or_obj):
         if hasattr(dct_or_obj, key):
             return  getattr(key, dct_or_obj)
@@ -444,7 +449,7 @@ def flatten(lst):
     """
     return list(itertools.chain.from_iterable(lst))
 
-
+@curry
 def concat(lst1, lst2):
     """
         Implmentation of ramda cancat
