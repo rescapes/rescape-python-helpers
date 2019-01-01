@@ -508,3 +508,30 @@ def map_prop_value_as_index(prp, lst):
     :return:
     """
     return from_pairs(map(lambda item: (prop(prp, item), item), lst))
+
+
+def to_dict_deep(obj, classkey=None):
+    """
+        Converts an object to a dict deeply
+    :param obj:
+    :param classkey:
+    :return:
+    """
+    if isinstance(dict, obj):
+        data = {}
+        for (k, v) in obj.items():
+            data[k] = to_dict_deep(v, classkey)
+        return data
+    elif hasattr(obj, "_ast"):
+        return to_dict_deep(obj._ast())
+    elif hasattr(obj, "__iter__") and not isinstance(str, obj):
+        return [to_dict_deep(v, classkey) for v in obj]
+    elif hasattr(obj, "__dict__"):
+        data = dict([(key, to_dict_deep(value, classkey))
+            for key, value in obj.__dict__.items()
+            if not callable(value) and not key.startswith('_')])
+        if classkey is not None and hasattr(obj, "__class__"):
+            data[classkey] = obj.__class__.__name__
+        return data
+    else:
+        return obj

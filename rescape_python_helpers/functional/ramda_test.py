@@ -1,4 +1,6 @@
 from snapshottest import TestCase
+
+from rescape_python_helpers.functional.ramda import to_dict_deep
 from . import ramda as R
 
 class TestRamda(TestCase):
@@ -52,3 +54,13 @@ class TestRamda(TestCase):
             zoo=dict(a=3, b=2, c=4, d=4, e=4, pen=dict(bull=False, cow=True)),
             nursery=[1,2]
         )
+
+    def test_to_dict_deep(self):
+        class Beobazte(object):
+            def __init__(self):
+                self.cream = 'yummy'
+        class Radish(object):
+            def __init__(self, cut):
+                self.garnish = Beobazte()
+                self.cut = cut
+        assert to_dict_deep(Radish('spiraled')) == dict(garnish=dict(cream='yummy'), cut='spiraled')
