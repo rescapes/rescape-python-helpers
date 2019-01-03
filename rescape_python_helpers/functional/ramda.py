@@ -26,11 +26,12 @@ def prop(key, dct_or_obj):
             raise Exception("Key %s not expected for list type: %s" % (key, dct_or_obj))
     elif isinstance(object, dct_or_obj):
         if hasattr(dct_or_obj, key):
-            return  getattr(key, dct_or_obj)
+            return getattr(key, dct_or_obj)
         else:
             raise Exception("No key %s found for objects %s" % (key, dct_or_obj))
     else:
         raise Exception("%s is neither a dict nor objects" % dct_or_obj)
+
 
 @curry
 def filter_dict(f, dct):
@@ -41,6 +42,19 @@ def filter_dict(f, dct):
     :return: The filtered dict
     """
     return dict(filter(f, dct.items()))
+
+
+def all_pass_dict(f, dct):
+    """
+        Returns true if all dct values pass f
+    :param f: binary lambda predicate
+    :param dct:
+    :return: True or false
+    """
+    return all_pass(identity, map_with_obj_to_values(
+        lambda key, value: f(key, value),
+        dct
+    ))
 
 
 def compact_dict(dct):
@@ -253,7 +267,7 @@ def omit_deep(omit_props, dct):
 @curry
 def map_deep(map_props, dct):
     """
-    Implementation of omit that recurses. This tests the same keys at every level of dict and in lists
+    Implementation of map that recurses. This tests the same keys at every level of dict and in lists
     :param map_props: prop to unary function to map the value of a prop. The props are evaluated at every level
     of dct
     :param dct: Dict for deep processing
@@ -266,7 +280,7 @@ def map_deep(map_props, dct):
         return prop_or(always(value), key, map_props)(value)
 
     if isinstance(dict, dct):
-        # Filter out keys and then recurse on each value that wasn't filtered out
+        # Filter out keys and then recurse on each value
         return map_dict(map_deep_partial, compact_dict(
             map_with_obj(
                 # Lambda calls map_props[key](value) if map_props[key] exists, else returns value
@@ -277,6 +291,36 @@ def map_deep(map_props, dct):
     if isinstance((list, tuple), dct):
         # run map_deep on each value
         return map(map_deep_partial, dct)
+    # scalar
+    return dct
+
+
+@curry
+def filter_deep(filter_dct, dct):
+    """
+    Filters deeply by comparing dct to filter_dct's value at each depth. Whenever a mismatch occurs the whole
+    thing returns false
+    :param filter_dct: dict matching any portion of dct. E.g. filter_dct = {foo: {bar: 1}} would allow
+    {foo: {bar: 1, car: 2}} to pass, {foo: {bar: 2}} would fail, {goo: ...} would fail
+    :param dct: Dict for deep processing
+    :return: True if all pass else false
+    """
+
+    if isinstance(dict, dct):
+        # Filter out keys and then recurse on each value
+        return all_pass_dict(
+            # Recurse on each value if there is a corresponding filter_dct[key]. If not we pass
+            lambda key, value: filter_deep(prop(key, filter_dct), value) if hasattr(filter_dict, key) else True,
+            dct
+        )
+
+    if isinstance((list, tuple), dct):
+        # run map_deep on each value
+        return all_pass(
+            lambda value, i: filter_deep(filter_dict[i], value) if isinstance((list, tuple), filter_dict) and
+                                                                   filter_dict[i] else True,
+            iter(dct)
+        )
     # scalar
     return dct
 
@@ -449,6 +493,7 @@ def flatten(lst):
     """
     return list(itertools.chain.from_iterable(lst))
 
+
 @curry
 def concat(lst1, lst2):
     """
@@ -528,8 +573,8 @@ def to_dict_deep(obj, classkey=None):
         return [to_dict_deep(v, classkey) for v in obj]
     elif hasattr(obj, "__dict__"):
         data = dict([(key, to_dict_deep(value, classkey))
-            for key, value in obj.__dict__.items()
-            if not callable(value) and not key.startswith('_')])
+                     for key, value in obj.__dict__.items()
+                     if not callable(value) and not key.startswith('_')])
         if classkey is not None and hasattr(obj, "__class__"):
             data[classkey] = obj.__class__.__name__
         return data

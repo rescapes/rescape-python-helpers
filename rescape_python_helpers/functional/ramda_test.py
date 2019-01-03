@@ -1,6 +1,6 @@
 from snapshottest import TestCase
 
-from rescape_python_helpers.functional.ramda import to_dict_deep
+from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict
 from . import ramda as R
 
 class TestRamda(TestCase):
@@ -8,6 +8,9 @@ class TestRamda(TestCase):
     def test_filter_dict(self):
         dct = R.filter_dict(lambda keyvalue: keyvalue[0] == 'a', dict(a=1, b=2))
         assert dct == dict(a=1)
+
+    def test_all_paass_dict(self):
+        assert all_pass_dict(lambda k, v: v, dict(a=1, b=1))
 
     def test_map_prop_value_as_index(self):
         res = R.map_prop_value_as_index(
