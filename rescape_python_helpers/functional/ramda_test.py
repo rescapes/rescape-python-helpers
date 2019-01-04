@@ -9,8 +9,10 @@ class TestRamda(TestCase):
         dct = R.filter_dict(lambda keyvalue: keyvalue[0] == 'a', dict(a=1, b=2))
         assert dct == dict(a=1)
 
-    def test_all_paass_dict(self):
+    def test_all_pass_dict(self):
         assert all_pass_dict(lambda k, v: v, dict(a=1, b=1))
+        assert not all_pass_dict(lambda k, v: v, dict(a=1, b=None))
+        assert not all_pass_dict(lambda k, v: v == 2, dict(a=1, b=1))
 
     def test_map_prop_value_as_index(self):
         res = R.map_prop_value_as_index(
@@ -37,6 +39,64 @@ class TestRamda(TestCase):
         omit_keys = ['foo', 'bar']
         dct = dict(foo=1, bar=2, car=dict(foo=3, bar=4, tar=5, pepper=[[dict(achoo=1, bar=2), dict(kale=1, foo=2)]]))
         assert R.omit_deep(omit_keys, dct) == dict(car=dict(tar=5, pepper=[[dict(achoo=1), dict(kale=1)]]))
+
+    def test_filter_deep(self):
+        # This should pass
+        params1 = dict(
+            foo=1,
+            car=dict(foo=3)
+        )
+        # This should fail
+        params2 = dict(
+            foo=1,
+            car=dict(tool=3)
+        )
+        # This should pass
+        params3 = dict(
+        )
+        # This should pass
+        params4 = dict(
+            car=dict(
+                pepper=[
+                    [
+                        dict(achoo=1),
+                        dict(kale=1)
+                    ]
+                ]
+            )
+        )
+        # This should fail
+        params5 = dict(
+            car=dict(
+                pepper=[
+                    [
+                        dict(achoo=1),
+                        dict(kale=1),
+                        dict(shoe=1)
+                    ]
+                ]
+            )
+        )
+
+        dct = dict(
+            foo=1,
+            bar=2,
+            car=dict(
+                foo=3,
+                bar=4,
+                tar=5,
+                pepper=[
+                    [
+                        dict(achoo=1, bar=2),
+                        dict(kale=1, foo=2)]
+                ]
+            )
+        )
+        assert R.dict_matches_params_deep(params1, dct)
+        assert not R.dict_matches_params_deep(params2, dct)
+        assert R.dict_matches_params_deep(params3, dct)
+        assert R.dict_matches_params_deep(params4, dct)
+        assert not R.dict_matches_params_deep(params5, dct)
 
     def test_prop(self):
         assert R.prop('obazda', dict(obazda='dip')) == 'dip'
