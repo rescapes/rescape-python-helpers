@@ -29,6 +29,7 @@ from .functional.ramda import (
     merge_dicts,
     omit,
     omit_deep,
+    dict_matches_params_deep,
     prop,
     prop_eq,
     prop_eq_or,
