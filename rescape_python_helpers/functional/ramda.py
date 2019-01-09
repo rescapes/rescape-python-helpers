@@ -473,6 +473,18 @@ def merge_deep(dct1, dct2, merger=None):
     return my_merger.merge(dct1, dct2)
 
 
+def merge_all(dcts):
+    """
+        Shallow merge all the dcts
+    :param dcts:
+    :return:
+    """
+    return reduce(
+        lambda accum, dct: merge(accum, dct),
+        dict(),
+        dcts
+    )
+
 def merge_deep_all(dcts):
     """
         Merge deep all dicts using merge_deep
@@ -509,11 +521,20 @@ def compact(lst):
 
 def from_pairs(pairs):
     """
-        Implementation of ramda from_paris Converts a list of pairs or tuples of pairs to a dict
+        Implementation of ramda from_pairs Converts a list of pairs or tuples of pairs to a dict
     :param pairs:
     :return:
     """
     return {k: v for k, v in pairs}
+
+
+def to_pairs(dct):
+    """
+        Implementation of ramda to_pairs Converts a dict to a list of pairs
+    :param dct:
+    :return:
+    """
+    return dct.items()
 
 
 def flatten(lst):

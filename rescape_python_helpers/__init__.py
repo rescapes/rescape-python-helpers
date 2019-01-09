@@ -1,10 +1,12 @@
 from .functional.ramda import (
     item_str_path,
     from_pairs,
+    to_pairs,
     map_with_obj,
     map_key_values,
     map_with_obj_to_values,
     merge_deep_all,
+    merge_all,
     merge_deep,
     item_path_or,
     compact,
