@@ -1,7 +1,8 @@
 from snapshottest import TestCase
 
-from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict
+from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct
 from . import ramda as R
+
 
 class TestRamda(TestCase):
 
@@ -33,6 +34,7 @@ class TestRamda(TestCase):
         class Fellow(object):
             def __init__(self, one):
                 self.one = one
+
         assert R.item_path_or('racehorse', 'one.one.was', dict(one=Fellow(one=dict(was='a')))) == 'a'
 
     def test_omit_deep(self):
@@ -105,6 +107,7 @@ class TestRamda(TestCase):
         class Radish(object):
             def __init__(self, cut):
                 self.garnish = cut
+
         assert R.prop('garnish', Radish('spiraled')) == 'spiraled'
 
     def test_merge_deep_all(self):
@@ -115,15 +118,28 @@ class TestRamda(TestCase):
         ]) == dict(
             a=2,
             zoo=dict(a=3, b=2, c=4, d=4, e=4, pen=dict(bull=False, cow=True)),
-            nursery=[1,2]
+            nursery=[1, 2]
         )
 
     def test_to_dict_deep(self):
         class Beobazte(object):
             def __init__(self):
                 self.cream = 'yummy'
+
         class Radish(object):
             def __init__(self, cut):
                 self.garnish = Beobazte()
                 self.cut = cut
+
         assert to_dict_deep(Radish('spiraled')) == dict(garnish=dict(cream='yummy'), cut='spiraled')
+
+    def test_flatten_dct(self):
+        result = flatten_dct(
+            dict(iss=dict(there=dict(anybody=['willing', 'to'], listen=[dict(to='my'), 'story']))),
+            '__'
+        )
+        assert {'iss__there__anybody__0': 'willing',
+                'iss__there__anybody__1': 'to',
+                'iss__there__listen__0__to': 'my',
+                'iss__there__listen__1': 'story'
+                } == result

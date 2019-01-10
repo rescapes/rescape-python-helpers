@@ -340,7 +340,7 @@ def dict_matches_params_deep(params_dct, dct):
             # Recurse on each value if there is a corresponding filter_dct[key]. If not we pass
             lambda key, value: recurse_if_param_exists(params_dct, key, value),
             # We shallow merge, giving dct priority with (hopefully) unmatchable values
-            merge(map_with_obj(lambda k, v: 1/(-e * pi), params_dct), dct)
+            merge(map_with_obj(lambda k, v: 1 / (-e * pi), params_dct), dct)
         )
 
     if isinstance((list, tuple), dct):
@@ -400,10 +400,11 @@ def map_with_obj(f, dct):
     return f_dict
 
 
+@curry
 def map_with_obj_to_values(f, dct):
     """
         Like map_with_obj but just returns the mapped values an array and disgards the keys
-    :param f: Called wiht a key and value
+    :param f: Called with a key and value
     :param dct:
     :return {list}: values are the mapped value
     """
@@ -484,6 +485,7 @@ def merge_all(dcts):
         dict(),
         dcts
     )
+
 
 def merge_deep_all(dcts):
     """
@@ -632,3 +634,42 @@ def to_dict_deep(obj, classkey=None):
         return data
     else:
         return obj
+
+
+def flatten_dct(obj, separator):
+    """
+    Flattens an objects so deep keys and array indices become concatinated strings
+    E.g. {a: {b: [1, 3]}} => {'a.b.0': 1, 'a.b.1': 2}
+    @param {Object} obj The object to flattened
+    @param {Object} separator Key segment separator, probably either '.' or '__'
+    @returns {Object} The 1-D version of the object
+    :param obj:
+    :return:
+    """
+    return from_pairs(_flatten_dct(obj, separator))
+
+
+def _flatten_dct(obj, separator, recurse_keys=[]):
+    """
+
+    :param obj:
+    :param recurse_keys:
+    :return:
+    """
+    return if_else(
+        # If we have something iterable besides a string
+        isinstance((dict, list, tuple)),
+        # Then recurse on each object or array value
+        lambda o: compose(
+            flatten,
+            map_with_obj_to_values(lambda k, oo: _flatten_dct(oo, separator, concat(recurse_keys, [k]))),
+            # Convert lists and tuples to dict where indexes become keys
+            if_else(isinstance(dict), identity, list_to_dict)
+        )(o),
+        # If not an object return a single pair
+        lambda o: [[join(separator, recurse_keys), o]]
+    )(obj)
+
+
+def list_to_dict(lst):
+    return dict(zip(range(len(lst)), lst))
