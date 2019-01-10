@@ -267,32 +267,38 @@ def omit_deep(omit_props, dct):
 
 
 @curry
-def map_deep(map_props, dct):
+def map_with_obj_deep(f, dct):
     """
     Implementation of map that recurses. This tests the same keys at every level of dict and in lists
-    :param map_props: prop to unary function to map the value of a prop. The props are evaluated at every level
-    of dct
+    :param f: 2-ary function expecting a key and value and returns a modified value
     :param dct: Dict for deep processing
     :return: Modified dct with matching props mapped
     """
+    return _map_deep(lambda k, v: [k, f(k,v)], dct)
 
-    map_deep_partial = map_deep(map_props)
 
-    def test(key, value):
-        return prop_or(always(value), key, map_props)(value)
+def map_keys_deep(f, dct):
+    """
+    Implementation of map that recurses. This tests the same keys at every level of dict and in lists
+    :param f: 2-ary function expecting a key and value and returns a modified key
+    :param dct: Dict for deep processing
+    :return: Modified dct with matching props mapped
+    """
+    return _map_deep(lambda k, v: [f(k, v), v], dct)
+
+def _map_deep(f, dct):
+    """
+    Used by map_deep and map_keys_deep
+    :param map_props:
+    :param f: Expects a key and value and returns a pair
+    :param dct:
+    :return:
+    """
 
     if isinstance(dict, dct):
-        # Filter out keys and then recurse on each value
-        return map_dict(map_deep_partial, compact_dict(
-            map_with_obj(
-                # Lambda calls map_props[key](value) if map_props[key] exists, else returns value
-                lambda key, value: test(key, value),
-                dct
-            )
-        ))
-    if isinstance((list, tuple), dct):
-        # run map_deep on each value
-        return map(map_deep_partial, dct)
+        return map_key_values(lambda k, v: f(k, _map_deep(f, v)), dct)
+    elif isinstance((list, tuple), dct):
+        return map(lambda iv: f(iv[0], _map_deep(f, iv[1])), enumerate(dct))
     # scalar
     return dct
 
@@ -433,6 +439,20 @@ def map_keys(f, dct):
     f_dict = {}
     for k, v in dct.items():
         f_dict[f(k)] = v
+    return f_dict
+
+
+@curry
+def map_keys_with_obj(f, dct):
+    """
+        Calls f with each key and value of dct, possibly returning a modified key. Values are unchanged
+    :param f: Called with each key and value and returns the same key or a modified key
+    :param dct:
+    :return: A dct with keys possibly modifed but values unchanged
+    """
+    f_dict = {}
+    for k, v in dct.items():
+        f_dict[f(k, v)] = v
     return f_dict
 
 

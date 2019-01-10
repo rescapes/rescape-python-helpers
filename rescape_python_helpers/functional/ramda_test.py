@@ -1,6 +1,7 @@
 from snapshottest import TestCase
 
-from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct
+from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
+    map_with_obj_deep
 from . import ramda as R
 
 
@@ -143,3 +144,33 @@ class TestRamda(TestCase):
                 'iss__there__listen__0__to': 'my',
                 'iss__there__listen__1': 'story'
                 } == result
+
+    def test_map_with_obj_deep(self):
+        assert {'a': [{'b': [[[0, ['cCool']], [1, [{'d': ['fCool']}]]]]}]} == map_with_obj_deep(
+            lambda k, v: [f'{v}Cool' if isinstance(v, str) else v],
+            dict(
+                a=dict(
+                    b=[
+                        'c',
+                        dict(
+                            d='f'
+                        )
+                    ]
+                )
+            )
+        )
+
+    def test_map_keys_deep(self):
+        assert {'aCool': {'bCool': [[0, 'c'], [1, {'dCool': 'f'}]]}} == map_keys_deep(
+            lambda k, v: f'{k}Cool' if isinstance(k, str) else k,
+            dict(
+                a=dict(
+                    b=[
+                        'c',
+                        dict(
+                            d='f'
+                        )
+                    ]
+                )
+            )
+        )
