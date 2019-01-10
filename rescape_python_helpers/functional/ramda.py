@@ -277,6 +277,7 @@ def map_with_obj_deep(f, dct):
     return _map_deep(lambda k, v: [k, f(k,v)], dct)
 
 
+@curry
 def map_keys_deep(f, dct):
     """
     Implementation of map that recurses. This tests the same keys at every level of dict and in lists
@@ -656,6 +657,19 @@ def to_dict_deep(obj, classkey=None):
         return obj
 
 
+def flatten_dct_until(obj, until_func, separator):
+    """
+    Flattens an objects so deep keys and array indices become concatinated strings
+    E.g. {a: {b: [1, 3]}} => {'a.b.0': 1, 'a.b.1': 2}
+    @param {Object} obj The object to flattened
+    @param {Function} until_func stop flattening a line if the this function returns false for the current key
+    @param {Object} separator Key segment separator, probably either '.' or '__'
+    @returns {Object} The 1-D version of the object
+    :param obj:
+    :return:
+    """
+    return from_pairs(_flatten_dct(obj, until_func, separator))
+
 def flatten_dct(obj, separator):
     """
     Flattens an objects so deep keys and array indices become concatinated strings
@@ -666,13 +680,14 @@ def flatten_dct(obj, separator):
     :param obj:
     :return:
     """
-    return from_pairs(_flatten_dct(obj, separator))
+    return from_pairs(_flatten_dct(obj, always(True), separator))
 
-
-def _flatten_dct(obj, separator, recurse_keys=[]):
+def _flatten_dct(obj, until_func, separator, recurse_keys=[]):
     """
 
     :param obj:
+    :param until_func: Stops recursion on a certain line if the function returns false and the remaining
+    value is returned with the key
     :param recurse_keys:
     :return:
     """
@@ -682,7 +697,11 @@ def _flatten_dct(obj, separator, recurse_keys=[]):
         # Then recurse on each object or array value
         lambda o: compose(
             flatten,
-            map_with_obj_to_values(lambda k, oo: _flatten_dct(oo, separator, concat(recurse_keys, [k]))),
+            map_with_obj_to_values(
+                lambda k, oo: _flatten_dct(oo, until_func, separator, concat(recurse_keys, [k])) if
+                until_func(k) else
+                [[join(separator, concat(recurse_keys, [k])), oo]]
+            ),
             # Convert lists and tuples to dict where indexes become keys
             if_else(isinstance(dict), identity, list_to_dict)
         )(o),
