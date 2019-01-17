@@ -1,7 +1,7 @@
 from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
-    map_with_obj_deep
+    map_with_obj_deep, pick_deep
 from . import ramda as R
 
 
@@ -42,6 +42,17 @@ class TestRamda(TestCase):
         omit_keys = ['foo', 'bar']
         dct = dict(foo=1, bar=2, car=dict(foo=3, bar=4, tar=5, pepper=[[dict(achoo=1, bar=2), dict(kale=1, foo=2)]]))
         assert R.omit_deep(omit_keys, dct) == dict(car=dict(tar=5, pepper=[[dict(achoo=1), dict(kale=1)]]))
+
+    def test_pick_deep(self):
+        pick_out = dict(billy=dict(goat=['takes', 'a', 'bite'], of=dict(tire=True, shoe={}, popsicle=None)))
+        assert pick_deep(
+            pick_out,
+            dict(
+                billy=dict(goat=['takes', 'a', 'kite'],
+                           of=dict(tire=True, shoe=dict(default='left'), fruit=None, popsicle='Sweet')),
+                andthe=dict(cow=['jumps', 'over', 'the', 'coon'])
+            )
+        ) == dict(billy=dict(goat=['takes', 'a', 'kite'], of=dict(tire=True, shoe={}, popsicle='Sweet')))
 
     def test_filter_deep(self):
         # This should pass

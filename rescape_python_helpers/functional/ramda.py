@@ -61,11 +61,20 @@ def all_pass_dict(f, dct):
 
 def compact_dict(dct):
     """
-        Compacts a dct by removing pairs with a None value
+        Compacts a dct by removing pairs with a None value, meaning 0, None, [], {}, False, etc
     :param dct:
     :return: The filtered dict
     """
     return dict(filter(lambda key_value: key_value[1], dct.items()))
+
+
+def compact_dict_none(dct):
+    """
+        Compacts a dct by removing pairs with a None value. Other nil values pass
+    :param dct:
+    :return: The filtered dict
+    """
+    return dict(filter(lambda key_value: key_value[1] != None, dct.items()))
 
 
 @curry
@@ -262,6 +271,31 @@ def omit_deep(omit_props, dct):
     if isinstance((list, tuple), dct):
         # run omit_deep on each value
         return map(omit_partial, dct)
+    # scalar
+    return dct
+
+@curry
+def pick_deep(pick_dct, dct):
+    """
+    Implementation of pick that recurses. This tests the same keys at every level of dict and in lists
+    :param pick_dct: Deep dict matching some portion of dct.
+    :param dct: Dct to filter. Any key matching pick_dct pass through. It doesn't matter what the pick_dct value
+    is as long as the key exists. Arrays also pass through if the have matching values in pick_dct
+    :return:
+    """
+
+    if isinstance(dict, dct):
+        # Filter out keys and then recurse on each value that wasn't filtered out
+        return map_with_obj(
+            lambda k, v: pick_deep(prop(k, pick_dct), v),
+            pick(keys(pick_dct), dct)
+        )
+    if isinstance((list, tuple), dct):
+        # run pick_deep on each value
+        return map(
+            lambda tup: pick_deep(*tup),
+            list(zip(pick_dct or [], dct))
+        )
     # scalar
     return dct
 
