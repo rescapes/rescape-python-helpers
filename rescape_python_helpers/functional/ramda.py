@@ -1,3 +1,4 @@
+import copy
 from inspect import isfunction
 import itertools
 from math import inf, pi, e
@@ -274,6 +275,7 @@ def omit_deep(omit_props, dct):
     # scalar
     return dct
 
+
 @curry
 def pick_deep(pick_dct, dct):
     """
@@ -308,7 +310,7 @@ def map_with_obj_deep(f, dct):
     :param dct: Dict for deep processing
     :return: Modified dct with matching props mapped
     """
-    return _map_deep(lambda k, v: [k, f(k,v)], dct)
+    return _map_deep(lambda k, v: [k, f(k, v)], dct)
 
 
 @curry
@@ -320,6 +322,7 @@ def map_keys_deep(f, dct):
     :return: Modified dct with matching props mapped
     """
     return _map_deep(lambda k, v: [f(k, v), v], dct)
+
 
 def _map_deep(f, dct):
     """
@@ -333,7 +336,9 @@ def _map_deep(f, dct):
     if isinstance(dict, dct):
         return map_key_values(lambda k, v: f(k, _map_deep(f, v)), dct)
     elif isinstance((list, tuple), dct):
-        return map(lambda iv: f(iv[0], _map_deep(f, iv[1])), enumerate(dct))
+        # Call each value with the index as the key. Since f returns a key value discard the key that it returns
+        # Even if this is called with map_keys_deep we can't manipulate index values here
+        return map(lambda iv: f(iv[0], _map_deep(f, iv[1]))[1], enumerate(dct))
     # scalar
     return dct
 
@@ -423,7 +428,34 @@ def head(lst):
     :param lst:
     :return:
     """
-    return lst[0]
+    return lst[0] if length(lst) else None
+
+
+def last(lst):
+    """
+        Implementation of Ramda's last
+    :param lst:
+    :return:
+    """
+    return lst[-1] if length(lst) else None
+
+
+def tail(lst):
+    """
+        Implementation of Ramda's tail
+    :param lst:
+    :return:
+    """
+    return lst[1:] if length(lst) else []
+
+
+def init(lst):
+    """
+        Implementation of Ramda's init, which returns all but the last element of a lit
+    :param lst:
+    :return:
+    """
+    return lst[0: -1] if length(lst) else []
 
 
 @curry
@@ -704,6 +736,7 @@ def flatten_dct_until(obj, until_func, separator):
     """
     return from_pairs(_flatten_dct(obj, until_func, separator))
 
+
 def flatten_dct(obj, separator):
     """
     Flattens an objects so deep keys and array indices become concatinated strings
@@ -716,6 +749,7 @@ def flatten_dct(obj, separator):
     """
     return from_pairs(_flatten_dct(obj, always(True), separator))
 
+
 def _flatten_dct(obj, until_func, separator, recurse_keys=[]):
     """
 
@@ -726,9 +760,10 @@ def _flatten_dct(obj, until_func, separator, recurse_keys=[]):
     :return:
     """
     return if_else(
-        # If we have something iterable besides a string
-        isinstance((dict, list, tuple)),
-        # Then recurse on each object or array value
+        # If we have something iterable besides a string that is truty
+        both(isinstance((dict, list, tuple)), identity),
+        # Then recurse on each object or array value. If o is not truthy, meaning {} or [], return
+        # a single item dict with the keys and o as the value
         lambda o: compose(
             flatten,
             map_with_obj_to_values(
@@ -744,5 +779,156 @@ def _flatten_dct(obj, until_func, separator, recurse_keys=[]):
     )(obj)
 
 
+def key_string_to_lens_path(key_string):
+    """
+     Converts a key string like 'foo.bar.0.wopper' to ['foo', 'bar', 0, 'wopper']
+ :param {String} keyString The dot-separated key string
+ :return {[String]} The lens array containing string or integers
+    """
+    return map(
+        if_else(
+            isinstance(int),
+            # convert to int
+            lambda s: int(s),
+            # Leave the string alone
+            identity
+        ),
+        key_string.split('.')
+    )
+
+
+@curry
+def fake_lens_path_view(lens_path, obj):
+    """
+    Simulates R.view with a lens_path since we don't have lens functions
+    :param lens_path: Array of string paths
+    :param obj: Object containing the given path
+    :return: The value at the path or None
+    """
+    segment = head(lens_path)
+    return if_else(
+        both(lambda _: identity(segment), has(segment)),
+        # Recurse on the rest of the path
+        compose(fake_lens_path_view(tail(lens_path)), getitem(segment)),
+        # Give up
+        lambda _: None
+    )(obj)
+
+
+@curry
+def fake_lens_path_set(lens_path, value, obj):
+    """
+    Simulates R.set with a lens_path since we don't have lens functions
+    :param lens_path: Array of string paths
+    :param value: The value to set at the lens path
+    :param obj: Object containing the given path
+    :return: The value at the path or None
+    """
+    segment = head(lens_path)
+    obj_copy = copy.copy(obj)
+
+    def set_array_index(i, v, l):
+        # Fill the array with None up to the given index and set the index to v
+        try:
+            l[i] = v
+        except IndexError:
+            for _ in range(i - len(l) + 1):
+                l.append(None)
+            l[i] = v
+
+    if not (length(lens_path) - 1):
+        # Done
+        new_value = value
+    else:
+        # Find the value at the path or create a {} or [] at obj[segment]
+        found_or_created = item_path_or(
+            if_else(
+                lambda segment: segment.isnumeric(),
+                always([]),
+                always({})
+            )(head(tail(lens_path))),
+            segment,
+            obj
+        )
+        # Recurse on the rest of the path
+        new_value = fake_lens_path_set(tail(lens_path), value, found_or_created)
+
+    # Set or replace
+    if segment.isnumeric():
+        set_array_index(int(segment), new_value, obj_copy)
+    else:
+        obj_copy[segment] = new_value
+    return obj_copy
+
+
+def unflatten_dct(obj):
+    """
+    Undoes the work of flatten_dict
+    @param {Object} obj 1-D object in the form returned by flattenObj
+    @returns {Object} The original 
+    :param obj: 
+    :return: 
+    """
+
+    def reduce_func(accum, key_string_and_value):
+        key_string = key_string_and_value[0]
+        value = key_string_and_value[1]
+        item_key_path = key_string_to_lens_path(key_string)
+        # All but the last segment gives us the item container len
+        container_key_path = init(item_key_path)
+        container = unless(
+            # If the path has any length (not []) and the value is set, don't do anything
+            both(always(length(container_key_path)), fake_lens_path_view(container_key_path)),
+            # Else we are at the top level, so use the existing accum or create a [] or {}
+            # depending on if our item key is a number or not
+            lambda x: default_to(
+                if_else(
+                    lambda segment: segment.isnumeric(),
+                    always([]),
+                    always({})
+                )(head(item_key_path))
+            )(x)
+        )(accum)
+        # Finally set the container at the itemLensPath
+        return fake_lens_path_set(
+            item_key_path,
+            value,
+            container
+        )
+
+    return compose(
+        reduce(
+            reduce_func,
+            # null initial value
+            None
+        ),
+        to_pairs
+    )(obj)
+
+
 def list_to_dict(lst):
     return dict(zip(range(len(lst)), lst))
+
+
+@curry
+def when(if_pred, when_true, obj):
+    """
+        Ramda when implementation
+    :param if_pred:
+    :param when_true:
+    :param obj:
+    :return:
+    """
+    return if_else(if_pred, when_true, identity, obj)
+
+
+@curry
+def unless(unless_pred, when_not_true, obj):
+    """
+        Ramda unless implementation
+    :param unless_pred:
+    :param when_not_true:
+    :param obj:
+    :return:
+    """
+    return if_else(unless_pred, identity, when_not_true, obj)

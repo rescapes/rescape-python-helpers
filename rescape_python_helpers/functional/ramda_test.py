@@ -1,8 +1,12 @@
 from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
-    map_with_obj_deep, pick_deep
+    map_with_obj_deep, pick_deep, unflatten_dct
 from . import ramda as R
+
+
+def unflatten_obj(flat_dct):
+    pass
 
 
 class TestRamda(TestCase):
@@ -156,8 +160,35 @@ class TestRamda(TestCase):
                 'iss__there__listen__1': 'story'
                 } == result
 
+    def test_unflatten_dct(self):
+        dct = dict(iss=dict(there=dict(anybody=['willing', 'to'], listen=[dict(to='my'), 'story'])))
+        flat_dct = flatten_dct(dct, '.')
+        assert dct == unflatten_dct(flat_dct)
+
     def test_map_with_obj_deep(self):
-        assert {'a': [{'b': [[[0, ['cCool']], [1, [{'d': ['fCool']}]]]]}]} == map_with_obj_deep(
+        assert {
+                   'a': [
+                       {'b': [
+                           [
+                               [
+                                   0,
+                                   ['cCool']
+                               ],
+                               [
+                                   1,
+                                   [
+                                       {'d':
+                                           [
+                                               'fCool'
+                                           ]
+                                       }
+                                   ]
+                               ]
+                           ]
+                       ]
+                       }
+                   ]
+               } == map_with_obj_deep(
             lambda k, v: [f'{v}Cool' if isinstance(v, str) else v],
             dict(
                 a=dict(
