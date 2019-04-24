@@ -608,6 +608,15 @@ def compact(lst):
     return filter(lambda x: x is not None, lst)
 
 
+def compact_empty(lst):
+    """
+        Ramda implmentation of compact. Removes empty strings
+    :param lst:
+    :return:
+    """
+    return filter(lambda x: x != '', lst)
+
+
 def from_pairs(pairs):
     """
         Implementation of ramda from_pairs Converts a list of pairs or tuples of pairs to a dict
