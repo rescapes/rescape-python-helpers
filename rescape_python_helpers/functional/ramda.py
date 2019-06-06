@@ -814,6 +814,9 @@ def fake_lens_path_view(lens_path, obj):
     :param obj: Object containing the given path
     :return: The value at the path or None
     """
+    if equals(0, length(lens_path)):
+        return obj
+
     segment = head(lens_path)
     return if_else(
         both(lambda _: identity(segment), has(segment)),

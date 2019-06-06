@@ -1,7 +1,7 @@
 from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
-    map_with_obj_deep, pick_deep, unflatten_dct
+    map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path
 from . import ramda as R
 
 
@@ -216,3 +216,13 @@ class TestRamda(TestCase):
                 )
             )
         )
+
+    def test_fake_lens_path_view(self):
+        result = fake_lens_path_view(key_string_to_lens_path('cherry.strawberry.orange'), dict(
+            cherry=dict(
+                strawberry=dict(
+                    orange='pretzel'
+                )
+            )
+        ))
+        assert result == 'pretzel'
