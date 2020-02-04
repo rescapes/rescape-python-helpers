@@ -1,7 +1,7 @@
 from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
-    map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path
+    map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props
 from . import ramda as R
 
 
@@ -226,3 +226,7 @@ class TestRamda(TestCase):
             )
         ))
         assert result == 'pretzel'
+
+    def test_props(self):
+        result = props(['myr', 'beite', 'seter'], dict(myr='soggy', beite='tasty', seter='sleepy', avfall='dirty'))
+        assert result == ['soggy', 'tasty', 'sleepy']

@@ -944,3 +944,18 @@ def unless(unless_pred, when_not_true, obj):
     :return:
     """
     return if_else(unless_pred, identity, when_not_true, obj)
+
+
+def props(props, obj_or_dict):
+    """
+        Rambda implmentation of props, which fetches each specified prop in a dict or object using
+        prop() on each of props. Props must all be defined
+    :param props: List of simple props
+    :param obj_or_dict: And object or dict
+    :return: A list of the resolved prop values
+    """
+
+    return map(
+        lambda p: prop(p, obj_or_dict),
+        props
+    )
