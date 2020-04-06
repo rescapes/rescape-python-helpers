@@ -830,7 +830,7 @@ def fake_lens_path_view(lens_path, obj):
 @curry
 def fake_lens_path_set(lens_path, value, obj):
     """
-    Simulates R.set with a lens_path since we don't have lens functions
+    Simulates R.set with a lens_path since we don't have lens functions. obj can be a dict or instance.
     :param lens_path: Array of string paths
     :param value: The value to set at the lens path
     :param obj: Object containing the given path
@@ -869,7 +869,10 @@ def fake_lens_path_set(lens_path, value, obj):
     if segment.isnumeric():
         set_array_index(int(segment), new_value, obj_copy)
     else:
-        obj_copy[segment] = new_value
+        if isinstance(dict, obj_copy):
+            obj_copy[segment] = new_value
+        elif isinstance(object, obj_copy):
+            setattr(obj_copy, segment, new_value)
     return obj_copy
 
 

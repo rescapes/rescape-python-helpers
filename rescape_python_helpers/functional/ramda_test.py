@@ -1,7 +1,7 @@
 from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
-    map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props
+    map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, fake_lens_path_set
 from . import ramda as R
 
 
@@ -44,7 +44,8 @@ class TestRamda(TestCase):
 
     def test_omit_deep(self):
         omit_keys = ['foo', 'bar']
-        dct = dict(marty={}, foo=1, bar=2, car=dict(foo=3, bar=4, tar=5, pepper=[[dict(achoo=1, bar=2), dict(kale=1, foo=2)]]))
+        dct = dict(marty={}, foo=1, bar=2,
+                   car=dict(foo=3, bar=4, tar=5, pepper=[[dict(achoo=1, bar=2), dict(kale=1, foo=2)]]))
         assert R.omit_deep(omit_keys, dct) == dict(marty={}, car=dict(tar=5, pepper=[[dict(achoo=1), dict(kale=1)]]))
 
     def test_pick_deep(self):
@@ -165,6 +166,7 @@ class TestRamda(TestCase):
         flat_dct = flatten_dct(dct, '.')
         assert dct == unflatten_dct(flat_dct)
 
+    # TODO Failing
     def test_map_with_obj_deep(self):
         assert {
                    'a': [
@@ -202,6 +204,7 @@ class TestRamda(TestCase):
             )
         )
 
+    # TODO Failing: [0, and [1 arrays get smashed together and 0 and 1 vanish
     def test_map_keys_deep(self):
         assert {'aCool': {'bCool': [[0, 'c'], [1, {'dCool': 'f'}]]}} == map_keys_deep(
             lambda k, v: f'{k}Cool' if isinstance(k, str) else k,
@@ -226,6 +229,37 @@ class TestRamda(TestCase):
             )
         ))
         assert result == 'pretzel'
+
+    def test_fake_lens_path_set(self):
+        result = fake_lens_path_set(key_string_to_lens_path('cherry.strawberry.orange'), 'buddy holly', dict(
+            cherry=dict(
+                strawberry=dict(
+                    orange='pretzel'
+                )
+            )
+        ))
+        assert result == dict(
+            cherry=dict(
+                strawberry=dict(
+                    orange='buddy holly'
+                )
+            )
+        )
+
+        class Junior(object):
+            def __init__(self, one):
+                self.cherry = one
+
+        zob = fake_lens_path_set(key_string_to_lens_path('cherry.strawberry.orange'), 'buddy holly', Junior(dict(
+            strawberry=dict(
+                orange='pretzel'
+            )
+        )))
+        assert zob.__dict__ == Junior(dict(
+                strawberry=dict(
+                    orange='buddy holly'
+                )
+        )).__dict__
 
     def test_props(self):
         result = props(['myr', 'beite', 'seter'], dict(myr='soggy', beite='tasty', seter='sleepy', avfall='dirty'))
