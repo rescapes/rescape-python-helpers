@@ -951,7 +951,7 @@ def unless(unless_pred, when_not_true, obj):
 
 def props(props, obj_or_dict):
     """
-        Rambda implmentation of props, which fetches each specified prop in a dict or object using
+        Ramda implmentation of props, which fetches each specified prop in a dict or object using
         prop() on each of props. Props must all be defined
     :param props: List of simple props
     :param obj_or_dict: And object or dict
@@ -961,4 +961,26 @@ def props(props, obj_or_dict):
     return map(
         lambda p: prop(p, obj_or_dict),
         props
+    )
+
+
+def index_by(f, list):
+    """
+    Ramda implementation of index_by. Concats items into the bucket key produced by f(item) for each item of list
+    :param f:
+    :param list:
+    :return: Dict keyed by f(item) valued by list of items
+    """
+
+    def merge_result(f, acc, item):
+        key = f(item)
+        return merge(
+            acc,
+            {key: concat(prop_or([], key, acc), [item])}
+        )
+
+    return reduce(
+        lambda acc, item: merge_result(f, acc, item),
+        {},
+        list
     )

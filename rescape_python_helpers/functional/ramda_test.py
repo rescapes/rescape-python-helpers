@@ -1,7 +1,8 @@
 from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
-    map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, fake_lens_path_set
+    map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
+    fake_lens_path_set, index_by
 from . import ramda as R
 
 
@@ -256,11 +257,39 @@ class TestRamda(TestCase):
             )
         )))
         assert zob.__dict__ == Junior(dict(
-                strawberry=dict(
-                    orange='buddy holly'
-                )
+            strawberry=dict(
+                orange='buddy holly'
+            )
         )).__dict__
 
     def test_props(self):
         result = props(['myr', 'beite', 'seter'], dict(myr='soggy', beite='tasty', seter='sleepy', avfall='dirty'))
         assert result == ['soggy', 'tasty', 'sleepy']
+
+    def test_index_by(self):
+        assert index_by(
+            R.prop('topping'),
+            [
+                dict(apple='pie', topping='ice cream'),
+                dict(apple='tort', topping='ice cream'),
+                dict(apple='cider', topping='nutmeg'),
+                dict(apple='snapps', topping='nutmeg'),
+                dict(apple='vinegar', topping='none'),
+                dict(apple='jacks', topping='milk'),
+            ]
+        ) == {
+                   'ice cream': [
+                       dict(apple='pie', topping='ice cream'),
+                       dict(apple='tort', topping='ice cream')
+                   ],
+                   'nutmeg': [
+                       dict(apple='cider', topping='nutmeg'),
+                       dict(apple='snapps', topping='nutmeg')
+                   ],
+                   'none': [
+                       dict(apple='vinegar', topping='none'),
+                   ],
+                   'milk': [
+                       dict(apple='jacks', topping='milk')
+                   ]
+        }
