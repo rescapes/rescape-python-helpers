@@ -964,19 +964,35 @@ def props(props, obj_or_dict):
     )
 
 
+def to_array_if_not(obj):
+    """
+        Converts an item to an array if it's not
+    :param obj:
+    :return:
+    """
+    return obj if isinstance(list, obj) else [obj]
+
+
 def index_by(f, list):
     """
     Ramda implementation of index_by. Concats items into the bucket key produced by f(item) for each item of list
-    :param f:
-    :param list:
+    Note that if f returns multiple keys in an array then the items is put in multiple buckets
+    :param f: Returns a single value or array. The value or values are each used as a bucket key.
+    Multiple returned values means the item is indexed by multiple keys
+    :param list: The list to index
     :return: Dict keyed by f(item) valued by list of items
     """
 
     def merge_result(f, acc, item):
-        key = f(item)
-        return merge(
+        keys = f(item)
+        return reduce(
+            lambda a, key: merge(
+                a,
+                {key: concat(prop_or([], key, a), [item])}
+            ),
             acc,
-            {key: concat(prop_or([], key, acc), [item])}
+            # Itereate throuh each
+            to_array_if_not(keys)
         )
 
     return reduce(
