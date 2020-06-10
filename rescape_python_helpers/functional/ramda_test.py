@@ -2,7 +2,7 @@ from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
-    fake_lens_path_set, index_by
+    fake_lens_path_set, index_by, props_or, str_paths_or
 from . import ramda as R
 
 
@@ -266,6 +266,19 @@ class TestRamda(TestCase):
         result = props(['myr', 'beite', 'seter'], dict(myr='soggy', beite='tasty', seter='sleepy', avfall='dirty'))
         assert result == ['soggy', 'tasty', 'sleepy']
 
+    def test_props_or(self):
+        result = props_or('undefined', ['myr', 'smook', 'beite', 'seter'],
+                          dict(myr=None, beite='tasty', seter='sleepy', avfall='dirty'))
+        assert result == [None, 'undefined', 'tasty', 'sleepy']
+
+    def test_str_paths_or(self):
+        result = str_paths_or(
+            'undefined',
+            ['panda.myr', 'smook', 'panda.beite', 'panda.seter', 'avfall'],
+            dict(panda=dict(myr=None, beite='tasty', seter='sleepy'), avfall='dirty')
+        )
+        assert result == [None, 'undefined', 'tasty', 'sleepy', 'dirty']
+
     def test_index_by(self):
         assert index_by(
             R.prop('topping'),
@@ -292,4 +305,4 @@ class TestRamda(TestCase):
                    'milk': [
                        dict(apple='jacks', topping='milk')
                    ]
-        }
+               }

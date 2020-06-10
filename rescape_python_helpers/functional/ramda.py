@@ -100,6 +100,26 @@ def prop_or(default, key, dct_or_obj):
         return default
     return value
 
+@curry
+def prop_or_if_undefined(default, key, dct_or_obj):
+    """
+        Same as prop_or but doesn't default None, only missing keys
+        Ramda propOr implementation. This also resolves object attributes, so key
+        can be a dict prop or an attribute of dct_or_obj
+    :param default: Value if dct_or_obj doesn't have key_or_prop or the resolved value is null
+    :param key:
+    :param dct_or_obj:
+    :return:
+    """
+    # Note that hasattr is a builtin and getattr is a ramda function, hence the different arg position
+    if isinstance(dict, dct_or_obj):
+        value = dct_or_obj[key] if has(key, dct_or_obj) else default
+    elif isinstance(object, dct_or_obj):
+        value = getattr(key, dct_or_obj) if hasattr(dct_or_obj, key) else default
+    else:
+        value = default
+    return value
+
 
 @curry
 def prop_eq(key, value, dct):
@@ -183,6 +203,23 @@ def item_path_or(default, keys, dict_or_obj):
         current_value = prop_or(default, key, default_to({}, current_value))
     return current_value
 
+@curry
+def item_path_or_if_undefined(default, keys, dict_or_obj):
+    """
+    Optional version of item_path with a default value. keys can be dict keys or object attributes, or a combination
+    :param default:
+    :param keys: List of keys or dot-separated string
+    :param dict_or_obj: A dict or obj
+    :return:
+    """
+    if not keys:
+        raise ValueError("Expected at least one key, got {0}".format(keys))
+    resolved_keys = keys.split('.') if isinstance(str, keys) else keys
+    current_value = dict_or_obj
+    for key in resolved_keys:
+        current_value = prop_or_if_undefined(default, key, default_to({}, current_value))
+    return current_value
+
 
 def isint(value):
     try:
@@ -221,16 +258,23 @@ def item_str_path(keys, dct):
 
 
 @curry
-def item_str_path_or(default, keys, dct):
+def item_str_path_or(default, str_path, dct):
     """
         Given a string of path segments separated by ., splits them into an array. Int strings are converted
         to numbers to serve as an array index
     :param default: Value if any part yields None or undefined
-    :param keys: e.g. 'foo.bar.1.goo'
+    :param str_path: e.g. 'foo.bar.1.goo'
     :param dct: e.g. dict(foo=dict(bar=[dict(goo='a'), dict(goo='b')])
     :return: The resolved value or an error. E.g. for above the result would be b
     """
-    return item_path_or(default, map(lambda segment: int(segment) if isint(segment) else segment, keys.split('.')), dct)
+    return item_path_or(
+        default,
+        map(
+            lambda segment: int(segment) if isint(segment) else segment,
+            str_path.split('.')
+        ),
+        dct
+    )
 
 
 @curry
@@ -961,6 +1005,36 @@ def props(props, obj_or_dict):
     return map(
         lambda p: prop(p, obj_or_dict),
         props
+    )
+
+def props_or(undefined_value, props, obj_or_dict):
+    """
+        Ramda implmentation of props, which fetches each specified prop in a dict or object using
+        prop() on each of props.
+    :param undefined_value: Used if the prop doesn't exist
+    :param props: List of simple props
+    :param obj_or_dict: And object or dict
+    :return: A list of the resolved prop values
+    """
+
+    return map(
+        lambda p: prop(p, obj_or_dict) if has(p, obj_or_dict) else undefined_value,
+        props
+    )
+
+def str_paths_or(undefined_value, str_paths, obj_or_dict):
+    """
+        Ramda implmentation of props but for string pathas,
+         which fetches each specified prop in a dict or object using string_apth_or() on each of string_path
+    :param undefined_value: Used if the prop doesn't exist
+    :param str_paths: List of simple props
+    :param obj_or_dict: And object or dict
+    :return: A list of the resolved str_path values
+    """
+
+    return map(
+        lambda p: item_path_or_if_undefined(undefined_value, p, obj_or_dict),
+        str_paths
     )
 
 
