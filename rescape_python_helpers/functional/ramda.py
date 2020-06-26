@@ -100,6 +100,7 @@ def prop_or(default, key, dct_or_obj):
         return default
     return value
 
+
 @curry
 def prop_or_if_undefined(default, key, dct_or_obj):
     """
@@ -202,6 +203,7 @@ def item_path_or(default, keys, dict_or_obj):
     for key in resolved_keys:
         current_value = prop_or(default, key, default_to({}, current_value))
     return current_value
+
 
 @curry
 def item_path_or_if_undefined(default, keys, dict_or_obj):
@@ -526,6 +528,18 @@ def map_with_obj_to_values(f, dct):
     :return {list}: values are the mapped value
     """
     return list(values(map_with_obj(f, dct)))
+
+
+@curry
+def chain_with_obj_to_values(f, dct):
+    """
+        Returns the mapped values an array and disgards the keys.
+        The values are assumed to be lists and are chained together given a shallow flatten result
+    :param f: Called with a key and value
+    :param dct:
+    :return {list}: values are the mapped value
+    """
+    return list(itertools.chain.from_iterable(map_with_obj_to_values(f, dct)))
 
 
 @curry
@@ -1007,6 +1021,7 @@ def props(props, obj_or_dict):
         props
     )
 
+
 def props_or(undefined_value, props, obj_or_dict):
     """
         Ramda implmentation of props, which fetches each specified prop in a dict or object using
@@ -1021,6 +1036,7 @@ def props_or(undefined_value, props, obj_or_dict):
         lambda p: prop(p, obj_or_dict) if has(p, obj_or_dict) else undefined_value,
         props
     )
+
 
 def str_paths_or(undefined_value, str_paths, obj_or_dict):
     """

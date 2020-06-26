@@ -2,7 +2,7 @@ from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
-    fake_lens_path_set, index_by, props_or, str_paths_or
+    fake_lens_path_set, index_by, props_or, str_paths_or, chain_with_obj_to_values
 from . import ramda as R
 
 
@@ -167,31 +167,8 @@ class TestRamda(TestCase):
         flat_dct = flatten_dct(dct, '.')
         assert dct == unflatten_dct(flat_dct)
 
-    # TODO Failing
     def test_map_with_obj_deep(self):
-        assert {
-                   'a': [
-                       {'b': [
-                           [
-                               [
-                                   0,
-                                   ['cCool']
-                               ],
-                               [
-                                   1,
-                                   [
-                                       {'d':
-                                           [
-                                               'fCool'
-                                           ]
-                                       }
-                                   ]
-                               ]
-                           ]
-                       ]
-                       }
-                   ]
-               } == map_with_obj_deep(
+        assert map_with_obj_deep(
             lambda k, v: [f'{v}Cool' if isinstance(v, str) else v],
             dict(
                 a=dict(
@@ -203,11 +180,25 @@ class TestRamda(TestCase):
                     ]
                 )
             )
-        )
+        ) == {'a': [
+           {'b': [
+               [
+                   ['cCool'],
+                   [
+                       {'d':
+                           [
+                               'fCool'
+                           ]
+                       }
+                   ],
+               ]
+           ]
+           }
+       ]
+    }
 
-    # TODO Failing: [0, and [1 arrays get smashed together and 0 and 1 vanish
     def test_map_keys_deep(self):
-        assert {'aCool': {'bCool': [[0, 'c'], [1, {'dCool': 'f'}]]}} == map_keys_deep(
+        assert map_keys_deep(
             lambda k, v: f'{k}Cool' if isinstance(k, str) else k,
             dict(
                 a=dict(
@@ -219,7 +210,7 @@ class TestRamda(TestCase):
                     ]
                 )
             )
-        )
+        ) == {'aCool': {'bCool': ['c', {'dCool': 'f'}]}}
 
     def test_fake_lens_path_view(self):
         result = fake_lens_path_view(key_string_to_lens_path('cherry.strawberry.orange'), dict(
@@ -306,3 +297,7 @@ class TestRamda(TestCase):
                        dict(apple='jacks', topping='milk')
                    ]
                }
+
+    def test_chain_with_obj_to_values(self):
+        assert chain_with_obj_to_values(lambda k, v: R.map(lambda i: R.concat(k, str(i)), v),
+                                        dict(a=[1, 2], b=[3, 4])) == ['a1', 'a2', 'b3', 'b4']

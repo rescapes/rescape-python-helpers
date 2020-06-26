@@ -21,7 +21,7 @@ class CleanCommand(setuptools.Command):
 
 setuptools.setup(
     name="rescape_python_helpers",
-    version="0.0.32",
+    version="0.0.33",
     author="Andy Likuski",
     author_email="andy@likuski.org",
     description="Functional and geospatial helpers for Rescape projects",
