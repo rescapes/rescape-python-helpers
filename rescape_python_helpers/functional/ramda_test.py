@@ -2,7 +2,8 @@ from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
-    fake_lens_path_set, index_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise
+    fake_lens_path_set, index_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise, \
+    flatten_dct_until
 from . import ramda as R
 
 
@@ -298,9 +299,16 @@ class TestRamda(TestCase):
                    ]
                }
 
+
     def test_chain_with_obj_to_values(self):
         assert chain_with_obj_to_values(lambda k, v: R.map(lambda i: R.concat(k, str(i)), v),
                                         dict(a=[1, 2], b=[3, 4])) == ['a1', 'a2', 'b3', 'b4']
 
     def test_one_unique_or_raise(self):
         assert one_unique_or_raise(['Bah', 'Bah', 'Bah']) == 'Bah'
+
+
+    def test_flatten_dct_until(self):
+        dct = {'data': {'streets': ['Somehood']}}
+        assert flatten_dct_until(dct, lambda key: not R.isinstance(str, key) or not key.endswith('contains'), '__') == \
+               {'data__streets__0': 'Somehood'}
