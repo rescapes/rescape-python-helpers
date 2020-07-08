@@ -797,6 +797,7 @@ def flatten_dct_until(obj, until_func, separator):
     E.g. {a: {b: [1, 3]}} => {'a.b.0': 1, 'a.b.1': 2}
     @param {Object} obj The object to flattened
     @param {Function} until_func stop flattening a line if the this function returns false for the current key
+    Optionally takes value as a second arg if you want to test value's type
     @param {Object} separator Key segment separator, probably either '.' or '__'
     @returns {Object} The 1-D version of the object
     :param obj:
@@ -836,7 +837,7 @@ def _flatten_dct(obj, until_func, separator, recurse_keys=[]):
             flatten,
             map_with_obj_to_values(
                 lambda k, oo: _flatten_dct(oo, until_func, separator, concat(recurse_keys, [k])) if
-                until_func(k) else
+                until_func(k, oo) else
                 [[join(separator, concat(recurse_keys, [k])), oo]]
             ),
             # Convert lists and tuples to dict where indexes become keys

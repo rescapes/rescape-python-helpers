@@ -299,7 +299,6 @@ class TestRamda(TestCase):
                    ]
                }
 
-
     def test_chain_with_obj_to_values(self):
         assert chain_with_obj_to_values(lambda k, v: R.map(lambda i: R.concat(k, str(i)), v),
                                         dict(a=[1, 2], b=[3, 4])) == ['a1', 'a2', 'b3', 'b4']
@@ -307,8 +306,14 @@ class TestRamda(TestCase):
     def test_one_unique_or_raise(self):
         assert one_unique_or_raise(['Bah', 'Bah', 'Bah']) == 'Bah'
 
-
     def test_flatten_dct_until(self):
         dct = {'data': {'streets': ['Somehood']}}
-        assert flatten_dct_until(dct, lambda key: not R.isinstance(str, key) or not key.endswith('contains'), '__') == \
-               {'data__streets__0': 'Somehood'}
+
+        def test(key, value):
+            return not R.isinstance(list, value) and not key.endswith('contains')
+
+        assert flatten_dct_until(
+            dct,
+            test,
+            '__'
+        ) == {'data__streets': ['Somehood']}
