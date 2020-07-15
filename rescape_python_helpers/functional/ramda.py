@@ -8,6 +8,9 @@ from deepmerge import Merger
 from pyramda import *
 from json import dumps
 
+# Pick doesn't handle objects, sigh, so update below
+old_pick = pick
+
 
 @curry
 def prop(key, dct_or_obj):
@@ -197,9 +200,9 @@ def item_path_or(default, keys, dict_or_obj):
     :param dict_or_obj: A dict or obj
     :return:
     """
-    if not keys:
+    if keys == None:
         raise ValueError("Expected at least one key, got {0}".format(keys))
-    resolved_keys = keys.split('.') if isinstance(str, keys) else keys
+    resolved_keys = keys.split('.') if isinstance(str, keys) else to_array_if_not(keys)
     current_value = dict_or_obj
     for key in resolved_keys:
         current_value = prop_or(default, key, default_to({}, current_value))
@@ -321,6 +324,24 @@ def omit_deep(omit_props, dct):
         return map(omit_partial, dct)
     # scalar
     return dct
+
+
+def pick(keys, obj):
+    """
+        Overrides pyramda pick to handle objects, not just dicts, sigh
+    :param keys:
+    :param obj:
+    :return: A dict of the picked key, values. Missing keys are omitted
+    """
+    return old_pick(keys, obj) if isinstance(dict, obj) else \
+        from_pairs(
+            compact(
+                map(
+                    lambda key: [key, getattr(key, obj)] if has(key, obj) else None,
+                    keys
+                )
+            )
+        )
 
 
 @curry
@@ -797,7 +818,7 @@ def flatten_dct_until(obj, until_func, separator):
     E.g. {a: {b: [1, 3]}} => {'a.b.0': 1, 'a.b.1': 2}
     @param {Object} obj The object to flattened
     @param {Function} until_func stop flattening a line if the this function returns false for the current key
-    Optionally takes value as a second arg if you want to test value's type
+    Takes 2 args, key and value
     @param {Object} separator Key segment separator, probably either '.' or '__'
     @returns {Object} The 1-D version of the object
     :param obj:
@@ -915,7 +936,7 @@ def fake_lens_path_set(lens_path, value, obj):
         # Find the value at the path or create a {} or [] at obj[segment]
         found_or_created = item_path_or(
             if_else(
-                lambda segment: segment.isnumeric(),
+                lambda segment: isint(segment) or segment.isnumeric(),
                 always([]),
                 always({})
             )(head(tail(lens_path))),
@@ -926,7 +947,7 @@ def fake_lens_path_set(lens_path, value, obj):
         new_value = fake_lens_path_set(tail(lens_path), value, found_or_created)
 
     # Set or replace
-    if segment.isnumeric():
+    if isint(segment) or segment.isnumeric():
         set_array_index(int(segment), new_value, obj_copy)
     else:
         if isinstance(dict, obj_copy):

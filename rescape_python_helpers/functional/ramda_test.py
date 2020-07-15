@@ -3,7 +3,7 @@ from snapshottest import TestCase
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
     fake_lens_path_set, index_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise, \
-    flatten_dct_until
+    flatten_dct_until, pick
 from . import ramda as R
 
 
@@ -49,6 +49,15 @@ class TestRamda(TestCase):
         dct = dict(marty={}, foo=1, bar=2,
                    car=dict(foo=3, bar=4, tar=5, pepper=[[dict(achoo=1, bar=2), dict(kale=1, foo=2)]]))
         assert R.omit_deep(omit_keys, dct) == dict(marty={}, car=dict(tar=5, pepper=[[dict(achoo=1), dict(kale=1)]]))
+
+    def test_pick(self):
+        class Paddy(object):
+            def __init__(self, one, two):
+                self.one = one
+                self.two = two
+
+        assert pick(['a', 'b'], dict(a=1, c='cow')) == dict(a=1)
+        assert pick(['one', 'three'], Paddy(one=1, two=2)) == dict(one=1)
 
     def test_pick_deep(self):
         pick_out = dict(billy=dict(goat=['takes', 'a', 'bite'], of=dict(tire=True, shoe={}, popsicle=None)))
