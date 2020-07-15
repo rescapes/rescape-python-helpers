@@ -51,6 +51,7 @@ def filter_dict(f, dct):
     return dict(filter(f, dct.items()))
 
 
+@curry
 def all_pass_dict(f, dct):
     """
         Returns true if all dct values pass f
@@ -326,6 +327,7 @@ def omit_deep(omit_props, dct):
     return dct
 
 
+@curry
 def pick(keys, obj):
     """
         Overrides pyramda pick to handle objects, not just dicts, sigh
@@ -775,6 +777,7 @@ def isalambda(v):
     return isfunction(v) and v.__name__ == '<lambda>'
 
 
+@curry
 def map_prop_value_as_index(prp, lst):
     """
         Returns the given prop of each item in the list
@@ -812,6 +815,7 @@ def to_dict_deep(obj, classkey=None):
         return obj
 
 
+@curry
 def flatten_dct_until(obj, until_func, separator):
     """
     Flattens an objects so deep keys and array indices become concatinated strings
@@ -827,6 +831,7 @@ def flatten_dct_until(obj, until_func, separator):
     return from_pairs(_flatten_dct(obj, until_func, separator))
 
 
+@curry
 def flatten_dct(obj, separator):
     """
     Flattens an objects so deep keys and array indices become concatinated strings
@@ -1030,6 +1035,7 @@ def unless(unless_pred, when_not_true, obj):
     return if_else(unless_pred, identity, when_not_true, obj)
 
 
+@curry
 def props(props, obj_or_dict):
     """
         Ramda implmentation of props, which fetches each specified prop in a dict or object using
@@ -1045,6 +1051,7 @@ def props(props, obj_or_dict):
     )
 
 
+@curry
 def props_or(undefined_value, props, obj_or_dict):
     """
         Ramda implmentation of props, which fetches each specified prop in a dict or object using
@@ -1061,6 +1068,7 @@ def props_or(undefined_value, props, obj_or_dict):
     )
 
 
+@curry
 def str_paths_or(undefined_value, str_paths, obj_or_dict):
     """
         Ramda implmentation of props but for string pathas,
