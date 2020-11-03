@@ -1132,3 +1132,18 @@ def one_unique_or_raise(values):
     if compose(equals(1), length, lambda v: unique(v).tolist(), length)(values):
         return head(values)
     raise Exception(f'Expected one unique value in values, found {values}')
+
+
+def unique_by(func, objects):
+    """
+        Sorts by applying func to each item
+    :param func: Applied to each object to get the sortable result
+    :param objects: iterable
+    :return: The sorted objects
+    """
+    seen = set()
+    def hash(obj):
+        value = func(obj)
+        return value not in seen and not seen.add(value)
+
+    return [obj for obj in objects if hash(obj)]

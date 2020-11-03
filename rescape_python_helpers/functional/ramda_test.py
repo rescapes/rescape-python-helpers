@@ -3,7 +3,7 @@ from snapshottest import TestCase
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
     fake_lens_path_set, index_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise, \
-    flatten_dct_until, pick
+    flatten_dct_until, pick, unique_by
 from . import ramda as R
 
 
@@ -326,3 +326,19 @@ class TestRamda(TestCase):
             test,
             '__'
         ) == {'data__streets': ['Somehood']}
+
+    def test_unique_by(self):
+        objs = [{'question': 'ask'},
+                {'question': 'me'},
+                {'question': 'if'},
+                {'question': 'Im'},
+                {'question': 'an'},
+                {'question': 'apple'},
+                {'question': 'an'},
+                {'question': 'apple'},
+                {'question': 'ask'},
+                {'question': 'if'},
+                {'question': 'Im'},
+                {'question': 'me'}
+                ]
+        assert R.length(unique_by(R.prop('question'), objs)) == 6
