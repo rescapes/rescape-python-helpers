@@ -275,10 +275,10 @@ class TestRamda(TestCase):
     def test_str_paths_or(self):
         result = str_paths_or(
             'undefined',
-            ['panda.myr', 'smook', 'panda.beite', 'panda.seter', 'avfall'],
-            dict(panda=dict(myr=None, beite='tasty', seter='sleepy'), avfall='dirty')
+            ['panda.myr', 'smook', 'panda.beite', 'panda.seter', 'avfall', 'panda.george.2.1'],
+            dict(panda=dict(myr=None, beite='tasty', seter='sleepy', george=[0, 1, [0, 2]]), avfall='dirty')
         )
-        assert result == [None, 'undefined', 'tasty', 'sleepy', 'dirty']
+        assert result == [None, 'undefined', 'tasty', 'sleepy', 'dirty', 2]
 
     def test_index_by(self):
         assert index_by(

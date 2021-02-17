@@ -96,12 +96,14 @@ def prop_or(default, key, dct_or_obj):
     # Note that hasattr is a builtin and getattr is a ramda function, hence the different arg position
     if isinstance(dict, dct_or_obj):
         value = dct_or_obj[key] if has(key, dct_or_obj) else default
+    elif isinstance(list, dct_or_obj) or isinstance(tuple, dct_or_obj):
+        value = dct_or_obj[key] if length(dct_or_obj) > key and dct_or_obj[key] else default
     elif isinstance(object, dct_or_obj):
-        value = getattr(key, dct_or_obj) if hasattr(dct_or_obj, key) else default
+        value = getattr(key, dct_or_obj) if hasattr(dct_or_obj, key) and getattr(key, dct_or_obj) else default
     else:
         value = default
     # 0 and False are ok, None defaults
-    if value == None:
+    if value is None:
         return default
     return value
 
@@ -120,6 +122,8 @@ def prop_or_if_undefined(default, key, dct_or_obj):
     # Note that hasattr is a builtin and getattr is a ramda function, hence the different arg position
     if isinstance(dict, dct_or_obj):
         value = dct_or_obj[key] if has(key, dct_or_obj) else default
+    elif isinstance(list, dct_or_obj) or isinstance(tuple, dct_or_obj):
+        value = dct_or_obj[key] if length(dct_or_obj) > key and dct_or_obj[key] else default
     elif isinstance(object, dct_or_obj):
         value = getattr(key, dct_or_obj) if hasattr(dct_or_obj, key) else default
     else:
@@ -221,7 +225,8 @@ def item_path_or_if_undefined(default, keys, dict_or_obj):
     """
     if not keys:
         raise ValueError("Expected at least one key, got {0}".format(keys))
-    resolved_keys = keys.split('.') if isinstance(str, keys) else keys
+    resolved_keys = map(lambda segment: int(segment) if isint(segment) else segment, keys.split('.')) if isinstance(
+        str, keys) else keys
     current_value = dict_or_obj
     for key in resolved_keys:
         current_value = prop_or_if_undefined(default, key, default_to({}, current_value))
@@ -1142,6 +1147,7 @@ def unique_by(func, objects):
     :return: The sorted objects
     """
     seen = set()
+
     def hash(obj):
         value = func(obj)
         return value not in seen and not seen.add(value)
