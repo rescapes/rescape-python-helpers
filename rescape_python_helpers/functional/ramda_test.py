@@ -60,15 +60,23 @@ class TestRamda(TestCase):
         assert pick(['one', 'three'], Paddy(one=1, two=2)) == dict(one=1)
 
     def test_pick_deep(self):
-        pick_out = dict(billy=dict(goat=['takes', 'a', 'bite'], of=dict(tire=True, shoe={}, popsicle=None)))
+        pick_out = dict(
+            billy=dict(goat=['takes', 'a', 'bite'], of=dict(tire=True, shoe={}, popsicle=None)),
+            coat=True,
+        )
         assert pick_deep(
             pick_out,
             dict(
                 billy=dict(goat=['takes', 'a', 'kite'],
                            of=dict(tire=True, shoe=dict(default='left'), fruit=None, popsicle='Sweet')),
+                coat=dict(_and=['jacket']),
                 andthe=dict(cow=['jumps', 'over', 'the', 'coon'])
             )
-        ) == dict(billy=dict(goat=['takes', 'a', 'kite'], of=dict(tire=True, shoe={}, popsicle='Sweet')))
+        ) == dict(
+            billy=dict(goat=['takes', 'a', 'kite'],
+                       of=dict(tire=True, shoe={}, popsicle='Sweet')),
+            coat=dict(_and=['jacket'])
+        )
 
     def test_filter_deep(self):
         # This should pass

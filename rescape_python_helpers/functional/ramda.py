@@ -361,6 +361,11 @@ def pick_deep(pick_dct, dct):
     :return:
     """
 
+    # If our pick_dct is down to a primitive but dct is not, just return the dct if the boolean is true
+    # This is a recursion end case.
+    if isinstance((dict, list, tuple), dct) and not isinstance((dict, list, tuple), pick_dct):
+        return dct if pick_dct else None
+
     if isinstance(dict, dct):
         # Filter out keys and then recurse on each value that wasn't filtered out
         return map_with_obj(
