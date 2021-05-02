@@ -376,7 +376,10 @@ def pick_deep(pick_dct, dct):
         # run pick_deep on each value
         return map(
             lambda tup: pick_deep(*tup),
+            # If pick_dct is also an array, zip it. Otherwise just apply pick_dct to each item of dct
             list(zip(pick_dct or [], dct))
+            if isinstance((list, tuple), pick_dct)
+            else map(lambda item: (pick_dct, item), dct)
         )
     # scalar
     return dct
