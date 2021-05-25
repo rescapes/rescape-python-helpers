@@ -1,5 +1,4 @@
 import copy
-from numpy import unique
 from inspect import isfunction
 import itertools
 from math import inf, pi, e
@@ -1136,13 +1135,19 @@ def index_by(f, list):
     )
 
 
+def unique(list1):
+    # insert the list to the set
+    list_set = set(list1)
+    # convert the set to the list
+    return list(list_set)
+
 def one_unique_or_raise(values):
     """
         Returns the single unique value in values or raise if there isn't one
     :param values: List of values that can be compared with unique
     :return:
     """
-    if compose(equals(1), length, lambda v: unique(v).tolist(), length)(values):
+    if compose(equals(1), length, lambda v: unique(v), length)(values):
         return head(values)
     raise Exception(f'Expected one unique value in values, found {values}')
 
