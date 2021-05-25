@@ -1147,7 +1147,11 @@ def one_unique_or_raise(values):
     :param values: List of values that can be compared with unique
     :return:
     """
-    if compose(equals(1), length, lambda v: unique(v), length)(values):
+    if compose(
+            equals(1),
+            length,
+            lambda v: unique(v)
+    )(values):
         return head(values)
     raise Exception(f'Expected one unique value in values, found {values}')
 
