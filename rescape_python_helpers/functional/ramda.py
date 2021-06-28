@@ -957,7 +957,7 @@ def fake_lens_path_set(lens_path, value, obj):
                 always([]),
                 always({})
             )(head(tail(lens_path))),
-            segment,
+            int(segment) if isint(segment) else segment,
             obj
         )
         # Recurse on the rest of the path
