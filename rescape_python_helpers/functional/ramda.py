@@ -407,9 +407,10 @@ def pick_deep_all_array_items(pick_dct, dct):
         )
     if isinstance((list, tuple), dct):
         # run pick_deep on each value
-        if length(pick_dct) == 1:
+        if length(to_array_if_not(pick_dct)):
+            p = to_array_if_not(pick_dct)
             # Copy pict_dict item to match dct length
-            pick_dct = map(lambda _ : pick_dct[0], dct)
+            pick_dct = map(lambda _: p, dct)
         return map(
             lambda tup: pick_deep(*tup),
             # If pick_dct is also an array, zip it. Otherwise just apply pick_dct to each item of dct
