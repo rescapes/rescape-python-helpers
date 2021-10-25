@@ -9,3 +9,4 @@ simplejson==3.17.2
 jsonfield===2.0.2
 pytest==6.2.4
 pytest-cov==2.12.0
+bumpversion=0.6.0
