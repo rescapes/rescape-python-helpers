@@ -383,6 +383,42 @@ def pick_deep(pick_dct, dct):
     # scalar
     return dct
 
+@curry
+def pick_deep_all_array_items(pick_dct, dct):
+    """
+    Implementation of pick that recurses. This tests the same keys at every level of dict and in lists.
+    If a list is encountered pick all items, not just the indexes that correspond too pick_dict
+    :param pick_dct: Deep dict matching some portion of dct.
+    :param dct: Dct to filter. Any key matching pick_dct pass through. It doesn't matter what the pick_dct value
+    is as long as the key exists. Arrays also pass through if the have matching values in pick_dct
+    :return:
+    """
+
+    # If our pick_dct is down to a primitive but dct is not, just return the dct if the boolean is true
+    # This is a recursion end case.
+    if isinstance((dict, list, tuple), dct) and not isinstance((dict, list, tuple), pick_dct):
+        return dct if pick_dct else None
+
+    if isinstance(dict, dct):
+        # Filter out keys and then recurse on each value that wasn't filtered out
+        return map_with_obj(
+            lambda k, v: pick_deep_all_array_items(prop(k, pick_dct), v),
+            pick(keys(pick_dct), dct)
+        )
+    if isinstance((list, tuple), dct):
+        # run pick_deep on each value
+        if length(pick_dct) == 1:
+            # Copy pict_dict item to match dct length
+            pick_dct = map(lambda _ : pick_dct[0], dct)
+        return map(
+            lambda tup: pick_deep(*tup),
+            # If pick_dct is also an array, zip it. Otherwise just apply pick_dct to each item of dct
+            list(zip(pick_dct or [], dct))
+            if isinstance((list, tuple), pick_dct)
+            else map(lambda item: (pick_dct, item), dct)
+        )
+    # scalar
+    return dct
 
 @curry
 def map_with_obj_deep(f, dct):

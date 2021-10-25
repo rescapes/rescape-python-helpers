@@ -3,7 +3,7 @@ from snapshottest import TestCase
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
     fake_lens_path_set, index_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise, \
-    flatten_dct_until, pick, unique_by
+    flatten_dct_until, pick, unique_by, pick_deep_all_array_items
 from . import ramda as R
 
 
@@ -78,6 +78,24 @@ class TestRamda(TestCase):
             coat=dict(_and=['jacket'])
         )
 
+    def test_pick_deep_all_array_items(self):
+        pick_out = dict(
+            billy=dict(goat=['takes'], of=dict(tire=True, shoe={}, popsicle=None)),
+            coat=True,
+        )
+        assert pick_deep_all_array_items(
+            pick_out,
+            dict(
+                billy=dict(goat=['takes', 'a', 'kite'],
+                           of=dict(tire=True, shoe=dict(default='left'), fruit=None, popsicle='Sweet')),
+                coat=dict(_and=['jacket']),
+                andthe=dict(cow=['jumps', 'over', 'the', 'coon'])
+            )
+        ) == dict(
+            billy=dict(goat=['takes', 'a', 'kite'],
+                       of=dict(tire=True, shoe={}, popsicle='Sweet')),
+            coat=dict(_and=['jacket'])
+        )
     def test_filter_deep(self):
         # This should pass
         params1 = dict(
