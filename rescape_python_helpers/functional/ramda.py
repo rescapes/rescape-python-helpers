@@ -410,7 +410,7 @@ def pick_deep_all_array_items(pick_dct, dct):
         if length(to_array_if_not(pick_dct)):
             p = to_array_if_not(pick_dct)
             # Copy pict_dict item to match dct length
-            pick_dct = map(lambda _: p, dct)
+            pick_dct = map(lambda _: p[0], dct)
         return map(
             lambda tup: pick_deep(*tup),
             # If pick_dct is also an array, zip it. Otherwise just apply pick_dct to each item of dct
