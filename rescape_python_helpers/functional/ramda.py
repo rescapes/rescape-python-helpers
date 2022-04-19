@@ -330,6 +330,28 @@ def omit_deep(omit_props, dct):
     # scalar
     return dct
 
+@curry
+def find_all_deep(predicate, dct):
+    """
+    find all objects that match the predicate and return them as a flat list
+    :param predicate Takes each dict that is found in the data structure, including in lists
+    and tuples and returns those passing the prediate
+    :param dct:
+    :return:
+    """
+
+    find_all_deep_partial = find_all_deep(predicate)
+
+    if isinstance(dict, dct):
+        # Filter out keys and then recurse on each value that wasn't filtered out
+        results = filter(predicate, [dct])
+        return concat(results, chain(find_all_deep_partial, dct.values()))
+    if isinstance((list, tuple), dct):
+        # run omit_deep on each value
+        return chain(find_all_deep_partial, dct)
+    # scalar
+    return []
+
 
 @curry
 def pick(keys, obj):

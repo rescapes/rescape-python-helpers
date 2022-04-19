@@ -1,6 +1,14 @@
 from json import dumps
-from django.contrib.gis.geos import GeometryCollection, GEOSGeometry, Polygon
-from ..functional import ramda as R
+
+def raise_not_implemented_error():
+  raise not NotImplementedError('django is currently required to use geometry_helper modules. These should be changed to use pandas or similar')
+try:
+  from django.contrib.gis.geos import GeometryCollection, GEOSGeometry, Polygon
+
+except ImportError:
+  GeometryCollection = raise_not_implemented_error
+  GEOSGeometry = raise_not_implemented_error
+  Polygon = raise_not_implemented_error
 
 def geometry_from_geojson(geojson):
     """

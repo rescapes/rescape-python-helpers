@@ -3,7 +3,7 @@ from snapshottest import TestCase
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
     fake_lens_path_set, index_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise, \
-    flatten_dct_until, pick, unique_by, pick_deep_all_array_items
+    flatten_dct_until, pick, unique_by, pick_deep_all_array_items, prop, find_all_deep, prop_or
 from . import ramda as R
 
 
@@ -49,6 +49,13 @@ class TestRamda(TestCase):
         dct = dict(marty={}, foo=1, bar=2,
                    car=dict(foo=3, bar=4, tar=5, pepper=[[dict(achoo=1, bar=2), dict(kale=1, foo=2)]]))
         assert R.omit_deep(omit_keys, dct) == dict(marty={}, car=dict(tar=5, pepper=[[dict(achoo=1), dict(kale=1)]]))
+
+    def test_find_all_deep(self):
+        predicate = prop_or(False, 'id')
+        dct = dict(jimmy=dict(id=1, dock=dict(tock=dict(id=2), mim=[]),
+                              jam=dict(id=3, beverly=dict(sam=[dict(id=4), dict(ken=dict(id=5))]))))
+        assert len(find_all_deep(predicate, dct)) == 5
+        assert list(map(prop('id'), find_all_deep(predicate, dct))) == [1, 2, 3, 4, 5]
 
     def test_pick(self):
         class Paddy(object):
@@ -96,6 +103,7 @@ class TestRamda(TestCase):
                        of=dict(tire=True, shoe={}, popsicle='Sweet')),
             coat=dict(_and=['jacket'])
         )
+
     def test_filter_deep(self):
         # This should pass
         params1 = dict(
