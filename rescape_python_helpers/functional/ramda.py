@@ -347,11 +347,36 @@ def find_all_deep(predicate, dct):
         results = filter(predicate, [dct])
         return concat(results, chain(find_all_deep_partial, dct.values()))
     if isinstance((list, tuple), dct):
-        # run omit_deep on each value
+        # run find_all_deep on each value
         return chain(find_all_deep_partial, dct)
     # scalar
     return []
 
+@curry
+def replace_all_deep(mapping_func, dct):
+    """
+        Call mapping_func on all dicts deep in dct, possibly changing both the key and the object itself
+
+        e.g. replace_all_deep(lambda: key, value: [f'super${key}', f'${value}=>Brazil Nut'] if key=='nut'], dict(squirrel=dict(nut=acorn))
+        => dict(squirrel=dict(supernut='acorn=>Brazil Nut'))
+    :param mapping_func Takes each key value and returns a pair that possibly replaces
+    the key and value with a different pair, or changes only one of key and value or neither.
+    :param dct:
+    :return:
+    """
+
+    replace_all_deep_partial = replace_all_deep(mapping_func)
+
+    if isinstance(dict, dct):
+        # Recurse deep first
+        updated = map_dict(replace_all_deep_partial, dct)
+        # Map the top-level dict key,value to possibly something new
+        return map_key_values(mapping_func, updated)
+    if isinstance((list, tuple), dct):
+        # run replace_all_deep on each value
+        return map(replace_all_deep_partial, dct)
+    # scalar
+    return dct
 
 @curry
 def pick(keys, obj):

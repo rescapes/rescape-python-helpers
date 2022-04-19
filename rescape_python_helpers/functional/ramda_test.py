@@ -1,9 +1,11 @@
+from pyramda import map_dict
 from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
     fake_lens_path_set, index_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise, \
-    flatten_dct_until, pick, unique_by, pick_deep_all_array_items, prop, find_all_deep, prop_or
+    flatten_dct_until, pick, unique_by, pick_deep_all_array_items, prop, find_all_deep, prop_or, when, replace_all_deep, \
+    merge
 from . import ramda as R
 
 
@@ -56,6 +58,17 @@ class TestRamda(TestCase):
                               jam=dict(id=3, beverly=dict(sam=[dict(id=4), dict(ken=dict(id=5))]))))
         assert len(find_all_deep(predicate, dct)) == 5
         assert list(map(prop('id'), find_all_deep(predicate, dct))) == [1, 2, 3, 4, 5]
+
+    def test_replace_all_deep(self):
+        def mapping_func(key, value):
+            return when(
+                lambda key_value: prop_or(False, 'id', key_value[1]) if isinstance(key_value[1], dict) else False,
+                lambda key_value: [f'{key_value[0]}Super', merge(key_value[1], dict(great=key_value[1]['id']))]
+            )([key,value])
+
+        dct = dict(jimmy=dict(id=1, dock=dict(tock=dict(id=2), mim=[]),
+                              jam=dict(id=3, beverly=dict(sam=[dict(id=4), dict(ken=dict(id=5))]))))
+        assert replace_all_deep(mapping_func, dct)['jimmySuper']['jamSuper']['beverly']['sam'][1]['kenSuper']['great'] == 5
 
     def test_pick(self):
         class Paddy(object):
