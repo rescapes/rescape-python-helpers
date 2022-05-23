@@ -1002,8 +1002,8 @@ def fake_lens_path_view(lens_path, obj):
     segment = head(lens_path)
     return if_else(
         both(lambda _: identity(segment), has(segment)),
-        # Recurse on the rest of the path
-        compose(fake_lens_path_view(tail(lens_path)), getitem(segment)),
+        # Recurse on the rest of the path prop handles dicts and class instances
+        compose(fake_lens_path_view(tail(lens_path)), prop(segment)),
         # Give up
         lambda _: None
     )(obj)
@@ -1190,22 +1190,20 @@ def to_array_if_not(obj):
     return obj if isinstance(list, obj) else [obj]
 
 
-def index_by(f, list):
+def index_by_and_map_items(f, map_item, list):
     """
-    Ramda implementation of index_by. Concats items into the bucket key produced by f(item) for each item of list
-    Note that if f returns multiple keys in an array then the items is put in multiple buckets
-    :param f: Returns a single value or array. The value or values are each used as a bucket key.
-    Multiple returned values means the item is indexed by multiple keys
-    :param list: The list to index
-    :return: Dict keyed by f(item) valued by list of items
+        Same as index_by but also maps each item after indexing them
+    :param f:
+    :param map_item:
+    :param list:
+    :return:
     """
-
     def merge_result(f, acc, item):
         keys = f(item)
         return reduce(
             lambda a, key: merge(
                 a,
-                {key: concat(prop_or([], key, a), [item])}
+                {key: concat(prop_or([], key, a), [map_item(item)])}
             ),
             acc,
             # Itereate throuh each
@@ -1218,6 +1216,17 @@ def index_by(f, list):
         list
     )
 
+def index_by(f, list):
+    """
+    Ramda implementation of index_by. Concats items into the bucket key produced by f(item) for each item of list
+    Note that if f returns multiple keys in an array then the items is put in multiple buckets
+    :param f: Returns a single value or array. The value or values are each used as a bucket key.
+    Multiple returned values means the item is indexed by multiple keys
+    :param list: The list to index
+    :return: Dict keyed by f(item) valued by list of items
+    """
+
+    return index_by_and_map_items(f, lambda item: item, list)
 
 def unique(list1):
     # insert the list to the set

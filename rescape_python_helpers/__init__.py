@@ -46,14 +46,6 @@ from .functional.memoize import memoize
 # Easy access ro all ramda and pyramda methods
 from .functional import ramda
 
-from .geospatial.geometry_helpers import (
-    ewkt_from_feature,
-    geometrycollection_from_feature_collection,
-    geometry_from_geojson,
-    geometry_from_feature,
-)
-
 __all__ = [
     'functional.ramda',
-    'geospatial.geometry_helpers'
 ]

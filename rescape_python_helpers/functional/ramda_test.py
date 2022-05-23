@@ -5,7 +5,7 @@ from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict,
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
     fake_lens_path_set, index_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise, \
     flatten_dct_until, pick, unique_by, pick_deep_all_array_items, prop, find_all_deep, prop_or, when, replace_all_deep, \
-    merge
+    merge, index_by_and_map_items
 from . import ramda as R
 
 
@@ -352,6 +352,35 @@ class TestRamda(TestCase):
                    ],
                    'milk': [
                        dict(apple='jacks', topping='milk')
+                   ]
+               }
+
+    def test_index_by_and_map_items(self):
+        assert index_by_and_map_items(
+            R.prop('topping'),
+            R.omit(['topping']),
+            [
+                dict(apple='pie', topping='ice cream'),
+                dict(apple='tort', topping='ice cream'),
+                dict(apple='cider', topping='nutmeg'),
+                dict(apple='snapps', topping='nutmeg'),
+                dict(apple='vinegar', topping='none'),
+                dict(apple='jacks', topping='milk'),
+            ]
+        ) == {
+                   'ice cream': [
+                       dict(apple='pie'),
+                       dict(apple='tort')
+                   ],
+                   'nutmeg': [
+                       dict(apple='cider'),
+                       dict(apple='snapps')
+                   ],
+                   'none': [
+                       dict(apple='vinegar'),
+                   ],
+                   'milk': [
+                       dict(apple='jacks')
                    ]
                }
 
