@@ -93,7 +93,9 @@ def prop_or(default, key, dct_or_obj):
     :return:
     """
     # Note that hasattr is a builtin and getattr is a ramda function, hence the different arg position
-    if isinstance(dict, dct_or_obj):
+    if dct_or_obj is None:
+        return default
+    elif isinstance(dict, dct_or_obj):
         value = dct_or_obj[key] if has(key, dct_or_obj) else default
     elif isinstance(list, dct_or_obj) or isinstance(tuple, dct_or_obj):
         value = dct_or_obj[key] if length(dct_or_obj) > key and dct_or_obj[key] else default
@@ -1263,3 +1265,75 @@ def unique_by(func, objects):
         return value not in seen and not seen.add(value)
 
     return [obj for obj in objects if hash(obj)]
+
+
+def tuple_pairs_to_dict(tuples):
+    """
+    Converts tuple pairs to a dictionary
+    :param tuples:
+    :return:
+    """
+    return dict((k, v) for k, v in tuples)
+
+
+def extremes(lst):
+    """
+    TODO move to util functions
+    :param lst:
+    :return:
+    """
+    return [head(lst), last(lst)]
+
+
+def item_str_path_equals(str_path, item1, item2):
+    """
+        Tests if the two items equal at the given dot-separated path
+    :param str_path: dot-separated string path to traverse keys, attributes, or array indices
+    :param item1:
+    :param item2:
+    :return:
+    """
+    return equals(*map(
+        item_str_path(str_path),
+        [item1, item2]
+    ))
+
+
+def grouped(iterable, n):
+    """
+        Group list items in groups of n
+        https://stackoverflow.com/questions/5389507/iterating-over-every-two-elements-in-a-list
+    :param iterable:
+    :param n:
+    :return:
+    """
+    "s -> (s0,s1,s2,...sn-1), (sn,sn+1,sn+2,...s2n-1), (s2n,s2n+1,s2n+2,...s3n-1), ..."
+    return zip(*[iter(iterable)] * n)
+
+
+def find_or(default, predicate, iterable):
+    """
+        Returns the first found item or the default
+    :param default:
+    :param predicate:
+    :param iterable:
+    :return:
+    """
+    for found in (x for x in iterable if predicate(x)):
+        return found
+    return default
+
+
+def find_mapped_or(default, mapper, iterable):
+    """
+        Returns the first item that maps to non-null
+    :param default:
+    :param mapper:
+    :param iterable:
+    :return:
+    """
+    for item in iterable:
+        mapped = mapper(item)
+        if mapped:
+            return mapped
+    return default
