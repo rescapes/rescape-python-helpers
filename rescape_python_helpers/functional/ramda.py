@@ -1348,6 +1348,7 @@ def find_mapped_or(default, mapper, iterable):
     return default
 
 
+@curry
 def zip_with(func, lists):
     """
         Zip any number of lists into tuples of length len(sets). Map the tuples with func
@@ -1361,3 +1362,33 @@ def zip_with(func, lists):
         tuples
     )
 
+
+@curry
+def cond(predicate_resolver_pairs, value):
+    def predicate_and_resolve(predicate, resolver):
+        if predicate(value):
+            return resolver(value)
+
+    return find_mapped_or(
+        None,
+        lambda pair: predicate_and_resolve(*pair),
+        predicate_resolver_pairs
+    )
+
+
+def T(*args):
+    """
+        Takes any number of arguments and always returns True
+    :param args:
+    :return:
+    """
+    return True
+
+
+def F(*args):
+    """
+        Takes any number of arguments and always returns False
+    :param args:
+    :return:
+    """
+    return False

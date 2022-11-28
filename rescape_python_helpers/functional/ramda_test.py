@@ -1,12 +1,12 @@
 import inflection
-from pyramda import map_dict, identity, apply, compose
+from pyramda import map_dict, identity, apply, compose, gt, always
 from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
     fake_lens_path_set, index_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise, \
     flatten_dct_until, pick, unique_by, pick_deep_all_array_items, prop, find_all_deep, prop_or, when, replace_all_deep, \
-    merge, index_by_and_map_items, zip_with
+    merge, index_by_and_map_items, zip_with, cond
 from . import ramda as R
 from .. import concat
 
@@ -432,3 +432,15 @@ class TestRamda(TestCase):
             lambda a, func, b: func([a, b]),
             objs
         ) == [2, 'youshadow', 'SeeHanging']
+
+    def test_cond(self):
+        tester = cond([
+            [gt(3), always(3)],
+            [gt(2), always(2)],
+            [gt(1), always(1)]
+        ])
+        assert tester(0) == None
+        assert tester(1) == None
+        assert tester(2) == 1
+        assert tester(3) == 2
+        assert tester(4) == 3
