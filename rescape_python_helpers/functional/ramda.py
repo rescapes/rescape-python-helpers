@@ -332,6 +332,7 @@ def omit_deep(omit_props, dct):
     # scalar
     return dct
 
+
 @curry
 def find_all_deep(predicate, dct):
     """
@@ -353,6 +354,7 @@ def find_all_deep(predicate, dct):
         return chain(find_all_deep_partial, dct)
     # scalar
     return []
+
 
 @curry
 def replace_all_deep(mapping_func, dct):
@@ -379,6 +381,7 @@ def replace_all_deep(mapping_func, dct):
         return map(replace_all_deep_partial, dct)
     # scalar
     return dct
+
 
 @curry
 def pick(keys, obj):
@@ -432,6 +435,7 @@ def pick_deep(pick_dct, dct):
     # scalar
     return dct
 
+
 @curry
 def pick_deep_all_array_items(pick_dct, dct):
     """
@@ -469,6 +473,7 @@ def pick_deep_all_array_items(pick_dct, dct):
         )
     # scalar
     return dct
+
 
 @curry
 def map_with_obj_deep(f, dct):
@@ -1200,6 +1205,7 @@ def index_by_and_map_items(f, map_item, list):
     :param list:
     :return:
     """
+
     def merge_result(f, acc, item):
         keys = f(item)
         return reduce(
@@ -1218,6 +1224,7 @@ def index_by_and_map_items(f, map_item, list):
         list
     )
 
+
 def index_by(f, list):
     """
     Ramda implementation of index_by. Concats items into the bucket key produced by f(item) for each item of list
@@ -1230,11 +1237,13 @@ def index_by(f, list):
 
     return index_by_and_map_items(f, lambda item: item, list)
 
+
 def unique(list1):
     # insert the list to the set
     list_set = set(list1)
     # convert the set to the list
     return list(list_set)
+
 
 def one_unique_or_raise(values):
     """
@@ -1337,3 +1346,18 @@ def find_mapped_or(default, mapper, iterable):
         if mapped:
             return mapped
     return default
+
+
+def zip_with(func, lists):
+    """
+        Zip any number of lists into tuples of length len(sets). Map the tuples with func
+    :param func: A mapping function expecting len(sets) arguments
+    :param lists: Any number of lists
+    :return:
+    """
+    tuples = zip(*lists)
+    return map(
+        lambda args: func(*args),
+        tuples
+    )
+

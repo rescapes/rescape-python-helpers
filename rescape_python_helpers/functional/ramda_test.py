@@ -1,12 +1,14 @@
-from pyramda import map_dict
+import inflection
+from pyramda import map_dict, identity, apply, compose
 from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
     fake_lens_path_set, index_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise, \
     flatten_dct_until, pick, unique_by, pick_deep_all_array_items, prop, find_all_deep, prop_or, when, replace_all_deep, \
-    merge, index_by_and_map_items
+    merge, index_by_and_map_items, zip_with
 from . import ramda as R
+from .. import concat
 
 
 def unflatten_obj(flat_dct):
@@ -64,11 +66,12 @@ class TestRamda(TestCase):
             return when(
                 lambda key_value: prop_or(False, 'id', key_value[1]) if isinstance(key_value[1], dict) else False,
                 lambda key_value: [f'{key_value[0]}Super', merge(key_value[1], dict(great=key_value[1]['id']))]
-            )([key,value])
+            )([key, value])
 
         dct = dict(jimmy=dict(id=1, dock=dict(tock=dict(id=2), mim=[]),
                               jam=dict(id=3, beverly=dict(sam=[dict(id=4), dict(ken=dict(id=5))]))))
-        assert replace_all_deep(mapping_func, dct)['jimmySuper']['jamSuper']['beverly']['sam'][1]['kenSuper']['great'] == 5
+        assert replace_all_deep(mapping_func, dct)['jimmySuper']['jamSuper']['beverly']['sam'][1]['kenSuper'][
+                   'great'] == 5
 
     def test_pick(self):
         class Paddy(object):
@@ -418,3 +421,14 @@ class TestRamda(TestCase):
                 {'question': 'me'}
                 ]
         assert R.length(unique_by(R.prop('question'), objs)) == 6
+
+    def test_zip_with(self):
+        objs = [
+            ['do', 'you', 'see'],
+            [len, apply(concat), compose(inflection.camelize, '_'.join)],
+            ['a', 'shadow', 'hanging']
+        ]
+        assert zip_with(
+            lambda a, func, b: func([a, b]),
+            objs
+        ) == [2, 'youshadow', 'SeeHanging']
