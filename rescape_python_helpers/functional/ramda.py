@@ -1199,7 +1199,7 @@ def to_array_if_not(obj):
 
 def index_by_and_map_items(f, map_item, list):
     """
-        Same as index_by but also maps each item after indexing them
+        Same as group_by but also maps each item after indexing them
     :param f:
     :param map_item:
     :param list:
@@ -1225,9 +1225,9 @@ def index_by_and_map_items(f, map_item, list):
     )
 
 
-def index_by(f, list):
+def group_by(f, list):
     """
-    Ramda implementation of index_by. Concats items into the bucket key produced by f(item) for each item of list
+    Ramda implementation of group_by. Concats items into the bucket key produced by f(item) for each item of list
     Note that if f returns multiple keys in an array then the items is put in multiple buckets
     :param f: Returns a single value or array. The value or values are each used as a bucket key.
     Multiple returned values means the item is indexed by multiple keys

@@ -4,7 +4,7 @@ from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
-    fake_lens_path_set, index_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise, \
+    fake_lens_path_set, group_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise, \
     flatten_dct_until, pick, unique_by, pick_deep_all_array_items, prop, find_all_deep, prop_or, when, replace_all_deep, \
     merge, index_by_and_map_items, zip_with, cond
 from . import ramda as R
@@ -330,8 +330,8 @@ class TestRamda(TestCase):
         )
         assert result == [None, 'undefined', 'tasty', 'sleepy', 'dirty', 2]
 
-    def test_index_by(self):
-        assert index_by(
+    def test_group_by(self):
+        assert group_by(
             R.prop('topping'),
             [
                 dict(apple='pie', topping='ice cream'),
