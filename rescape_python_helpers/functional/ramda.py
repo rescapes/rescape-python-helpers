@@ -1214,7 +1214,7 @@ def index_by_and_map_items(f, map_item, list):
                 {key: concat(prop_or([], key, a), [map_item(item)])}
             ),
             acc,
-            # Itereate throuh each
+            # Itereate through each
             to_array_if_not(keys)
         )
 
@@ -1236,6 +1236,16 @@ def group_by(f, list):
     """
 
     return index_by_and_map_items(f, lambda item: item, list)
+
+def index_by(f, list):
+    """
+    Ramda implementation of index_by. Makes the result of f the key of a dict. Duplicates are overwritten
+    :param f: Returns a single value to use as a hash key
+    :param list: The list to index
+    :return: Dict keyed by f(item) valued by each item
+    """
+
+    return from_pairs(map(lambda item: [f(item), item], list))
 
 
 def unique(list1):

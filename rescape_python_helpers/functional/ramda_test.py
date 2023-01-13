@@ -1,12 +1,12 @@
 import inflection
-from pyramda import map_dict, identity, apply, compose, gt, always
+from pyramda import apply, compose, gt, always
 from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
     fake_lens_path_set, group_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise, \
     flatten_dct_until, pick, unique_by, pick_deep_all_array_items, prop, find_all_deep, prop_or, when, replace_all_deep, \
-    merge, index_by_and_map_items, zip_with, cond
+    merge, index_by_and_map_items, zip_with, cond, index_by
 from . import ramda as R
 from .. import concat
 
@@ -329,6 +329,24 @@ class TestRamda(TestCase):
             dict(panda=dict(myr=None, beite='tasty', seter='sleepy', george=[0, 1, [0, 2]]), avfall='dirty')
         )
         assert result == [None, 'undefined', 'tasty', 'sleepy', 'dirty', 2]
+
+    def test_index_by(self):
+        assert index_by(
+            R.prop('topping'),
+            [
+                dict(apple='pie', topping='ice cream'),
+                dict(apple='tort', topping='ice cream'),
+                dict(apple='cider', topping='nutmeg'),
+                dict(apple='snapps', topping='nutmeg'),
+                dict(apple='vinegar', topping='none'),
+                dict(apple='jacks', topping='milk'),
+            ]
+        ) == {
+                   'ice cream': dict(apple='tort', topping='ice cream'),
+                   'nutmeg': dict(apple='snapps', topping='nutmeg'),
+                   'none': dict(apple='vinegar', topping='none'),
+                   'milk': dict(apple='jacks', topping='milk')
+               }
 
     def test_group_by(self):
         assert group_by(
