@@ -48,6 +48,21 @@ class TestRamda(TestCase):
 
         assert R.item_path_or('racehorse', 'one.one.was', dict(one=Fellow(one=dict(was='a')))) == 'a'
 
+    def test_prop_or(self):
+        dct = dict(mighty='fine', day='for it', weather=False, chicken=None)
+        assert prop_or('all', 'mighty', dct) == 'fine'
+        # False is non-nil, so don't default
+        assert prop_or('weather', 'weather', dct) == False  # noqa
+        assert prop_or('not', 'chicken', dct) == 'not'
+        class Pickles(object):
+            def __init__(self, one, two):
+                self.one = one
+                self.two = two
+        pickle = Pickles(one='one', two=None)
+        assert prop_or('all', 'one', pickle) == 'one'
+        assert prop_or('was one two', 'two', pickle) == 'was one two'
+
+
     def test_omit_deep(self):
         omit_keys = ['foo', 'bar']
         dct = dict(marty={}, foo=1, bar=2,
