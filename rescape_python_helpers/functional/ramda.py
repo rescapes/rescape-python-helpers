@@ -145,16 +145,19 @@ def prop_eq(key, value, dct):
 
 
 @curry
-def prop_eq_or(default, key, value, dct):
+def prop_eq_or(default, key, value, dct_or_obj):
     """
-        Ramda propEq plus propOr implementation
+        Ramda propEq plus propOr implementation. Returns True or the default
     :param default:
     :param key:
     :param value:
-    :param dct:
+    :param dct_or_obj:
     :return:
     """
-    return dct[key] and dct[key] == value if key in dct else default
+    if isinstance(dict, dct_or_obj):
+        return dct_or_obj[key] and (dct_or_obj[key] == value or default) if key in dct_or_obj else default
+    elif dct_or_obj:
+        return (getattr(key, dct_or_obj) == value or default) if hasattr(dct_or_obj, key) else default
 
 
 @curry

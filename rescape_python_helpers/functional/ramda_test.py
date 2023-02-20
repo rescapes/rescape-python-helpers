@@ -1,3 +1,5 @@
+from typing import Dict
+
 import inflection
 from pyramda import apply, compose, gt, always
 from snapshottest import TestCase
@@ -6,13 +8,20 @@ from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict,
     map_with_obj_deep, pick_deep, unflatten_dct, fake_lens_path_view, key_string_to_lens_path, props, \
     fake_lens_path_set, group_by, props_or, str_paths_or, chain_with_obj_to_values, one_unique_or_raise, \
     flatten_dct_until, pick, unique_by, pick_deep_all_array_items, prop, find_all_deep, prop_or, when, replace_all_deep, \
-    merge, index_by_and_map_items, zip_with, cond, index_by
+    merge, index_by_and_map_items, zip_with, cond, index_by, prop_eq_or, prop_eq
 from . import ramda as R
 from .. import concat
+from pydantic import BaseModel
 
 
 def unflatten_obj(flat_dct):
     pass
+
+
+class TestModel(BaseModel):
+    cheese: str
+    cracker: int
+    tv: Dict[str, int]
 
 
 class TestRamda(TestCase):
@@ -54,14 +63,31 @@ class TestRamda(TestCase):
         # False is non-nil, so don't default
         assert prop_or('weather', 'weather', dct) == False  # noqa
         assert prop_or('not', 'chicken', dct) == 'not'
+
         class Pickles(object):
             def __init__(self, one, two):
                 self.one = one
                 self.two = two
+
         pickle = Pickles(one='one', two=None)
         assert prop_or('all', 'one', pickle) == 'one'
         assert prop_or('was one two', 'two', pickle) == 'was one two'
 
+    def test_prop_eq(self):
+        dct = dict(mighty='fine', day='for it', weather=False, chicken=None)
+        str_cheese = TestModel(cheese='it', cracker=2, tv=dict(rots=1))
+        assert prop_eq('day', 'for it', dct) == True
+        assert prop_eq('day', 'for it!', dct) == False
+        assert prop_eq('cheese', 'it', str_cheese) == True
+        assert prop_eq('cheese', 2, str_cheese) == False
+
+    def test_prop_eq_or(self):
+        dct = dict(mighty='fine', day='for it', weather=False, chicken=None)
+        str_cheese = TestModel(cheese='it', cracker=2, tv=dict(rots=1))
+        assert prop_eq_or(44, 'day', 'for it', dct) == True
+        assert prop_eq_or(44, 'day', 'for it!', dct) == 44
+        assert prop_eq_or(44, 'cheese', 'it', str_cheese) == True
+        assert prop_eq_or(44, 'cheese', 2, str_cheese) == 44
 
     def test_omit_deep(self):
         omit_keys = ['foo', 'bar']
