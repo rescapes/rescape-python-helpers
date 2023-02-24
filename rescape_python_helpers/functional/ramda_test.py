@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 import inflection
 from pyramda import apply, compose, gt, always
@@ -18,17 +18,29 @@ def unflatten_obj(flat_dct):
     pass
 
 
+class FastModel(BaseModel):
+    up: int
+
+
 class TestModel(BaseModel):
     cheese: str
     cracker: int
     tv: Dict[str, int]
+    tempo: Optional[FastModel]
 
 
 class TestRamda(TestCase):
 
     def test_filter_dict(self):
-        dct = R.filter_dict(lambda keyvalue: keyvalue[0] == 'a', dict(a=1, b=2))
+        dct = R.filter_object_or_dict(lambda keyvalue: keyvalue[0] == 'a', dict(a=1, b=2))
         assert dct == dict(a=1)
+
+    def test_filter_obj(self):
+        obj = R.filter_object_or_dict(
+            lambda keyvalue: keyvalue[0] == 'tempo',
+            TestModel(cheese='cake', cracker=2, tv=dict(turn=1), tempo=FastModel(up=1))
+        )
+        assert obj == dict(tempo=FastModel(up=1))
 
     def test_all_pass_dict(self):
         assert all_pass_dict(lambda k, v: v, dict(a=1, b=1))
@@ -416,6 +428,13 @@ class TestRamda(TestCase):
                        dict(apple='jacks', topping='milk')
                    ]
                }
+
+    def test_omit_obj(self):
+        obj = R.omit(
+            ['cheese'],
+            TestModel(cheese='cake', cracker=2, tv=dict(turn=1), tempo=FastModel(up=1))
+        )
+        assert obj == dict(cracker=2, tv=dict(turn=1), tempo=FastModel(up=1))
 
     def test_index_by_and_map_items(self):
         assert index_by_and_map_items(

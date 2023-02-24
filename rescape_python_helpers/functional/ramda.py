@@ -40,14 +40,31 @@ def prop(key, dct_or_obj):
 
 
 @curry
-def filter_dict(f, dct):
+def filter_object_or_dict(f, object_or_dct):
     """
-        Filter a dict
+        Filter an object or dict. If a pydantic model, the object is converted to dict but only at the top level,
+        preserving attribute values as pydantic models
+    :param f: lambda or function expecting a tuple (key, value)
+    :param object_or_dct: A pydantic model or dict
+    :return: A dict with the filtered properties
+    """
+    if not isinstance(dict, object_or_dct):
+        # Do this instead of object_or_dct.dict() so we don't convert deeper pydantic instances to dicts
+        dct = dict((i, j) for i, j in object_or_dct)
+    else:
+        dct = object_or_dct
+    return dict(filter(f, dct.items()))
+
+
+@curry
+def filter_dict(f, object_or_dct):
+    """
+        Filter an object or dict
     :param f: lambda or function expecting a tuple (key, value)
     :param dict:
     :return: The filtered dict
     """
-    return dict(filter(f, dct.items()))
+    return filter_object_or_dict(f, object_or_dct)
 
 
 @curry
@@ -305,14 +322,14 @@ def has(prop, object_or_dct):
 
 
 @curry
-def omit(omit_props, dct):
+def omit(omit_props, object_or_dct):
     """
-    Implementation of omit
-    :param omit_props:
-    :param dct:
-    :return:
+    Implementation of omit supporting objects or dicts
+    :param omit_props: String array of props to omit
+    :param object_or_dct: A pydantic model or dict
+    :return: A dict with the omitted props
     """
-    return filter_dict(lambda key_value: key_value[0] not in omit_props, dct)
+    return filter_object_or_dict(lambda key_value: key_value[0] not in omit_props, object_or_dct)
 
 
 @curry

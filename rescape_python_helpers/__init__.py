@@ -14,7 +14,7 @@ from .functional.ramda import (
     concat,
     default_to,
     dump_json,
-    filter_dict,
+    filter_object_or_dict,
     flatten,
     from_pairs_to_array_values,
     fullname,
