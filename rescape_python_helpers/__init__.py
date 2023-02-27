@@ -45,7 +45,9 @@ from .functional.memoize import memoize
 
 # Easy access ro all ramda and pyramda methods
 from .functional import ramda
+from .pyramda import *
 
 __all__ = [
     'functional.ramda',
+    'pyramda'
 ]
