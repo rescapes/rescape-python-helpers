@@ -1,7 +1,7 @@
 from typing import Dict, Optional
 
 import inflection
-from pyramda import apply, compose, gt, always
+from rescape_python_helpers.pyramda import apply, compose, gt, always
 from snapshottest import TestCase
 
 from rescape_python_helpers.functional.ramda import to_dict_deep, all_pass_dict, flatten_dct, map_keys_deep, \
