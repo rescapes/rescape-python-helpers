@@ -21,7 +21,7 @@ class CleanCommand(setuptools.Command):
 
 setuptools.setup(
     name="rescape_python_helpers",
-    version="0.0.63",
+    version="0.0.64",
     author="Andy Likuski",
     author_email="andy@likuski.org",
     description="Functional and geospatial helpers for Rescape projects. Pyramda library by from https://github.com/jackfirth/pyramda incorporated in after it stopped working with new Python relases",

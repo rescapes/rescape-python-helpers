@@ -38,7 +38,12 @@ from .functional.ramda import (
     prop_eq_or,
     prop_eq_or_in,
     prop_eq_or_in_or,
-    prop_or
+    prop_or,
+    zip_with,
+    to_array_if_not,
+    group_by,
+    tail,
+    unique
 )
 
 from .functional.memoize import memoize
@@ -46,8 +51,10 @@ from .functional.memoize import memoize
 # Easy access ro all ramda and pyramda methods
 from .functional import ramda
 from .pyramda import *
+# Provide an alias so it's easy to import these
+from .pyramda import map as r_map, filter as r_filter
 
 __all__ = [
-    'functional.ramda',
+    'functional',
     'pyramda'
 ]

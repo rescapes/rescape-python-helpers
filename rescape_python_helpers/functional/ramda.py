@@ -39,6 +39,15 @@ def prop(key, dct_or_obj):
         raise Exception("%s is neither a dict nor objects" % dct_or_obj)
 
 
+def pydantic_to_dict_shallow(obj):
+    """
+        Shallow converts a pydantic model to a dict without converting inner values
+    :param obj:
+    :return:
+    """
+    return dict((i, j) for i, j in obj)
+
+
 @curry
 def filter_object_or_dict(f, object_or_dct):
     """
@@ -50,7 +59,7 @@ def filter_object_or_dict(f, object_or_dct):
     """
     if not isinstance(dict, object_or_dct):
         # Do this instead of object_or_dct.dict() so we don't convert deeper pydantic instances to dicts
-        dct = dict((i, j) for i, j in object_or_dct)
+        dct = pydantic_to_dict_shallow(object_or_dct)
     else:
         dct = object_or_dct
     return dict(filter(f, dct.items()))
@@ -117,7 +126,8 @@ def prop_or(default, key, dct_or_obj):
     elif isinstance(list, dct_or_obj) or isinstance(tuple, dct_or_obj):
         value = dct_or_obj[key] if length(dct_or_obj) > key and dct_or_obj[key] is not None else default
     elif isinstance(object, dct_or_obj):
-        value = getattr(key, dct_or_obj) if hasattr(dct_or_obj, key) and getattr(key, dct_or_obj) is not None else default
+        value = getattr(key, dct_or_obj) if hasattr(dct_or_obj, key) and getattr(key,
+                                                                                 dct_or_obj) is not None else default
     else:
         value = default
     # 0 and False are ok, None defaults
@@ -200,10 +210,10 @@ def prop_eq_or_in_or(default, key, value, dct):
     :return:
     """
     return has(key, dct) and \
-           (dct[key] == value if key in dct else (
-               dct[key] in value if isinstance((list, tuple), value) and not isinstance(str, value)
-               else default
-           ))
+        (dct[key] == value if key in dct else (
+            dct[key] in value if isinstance((list, tuple), value) and not isinstance(str, value)
+            else default
+        ))
 
 
 @curry
