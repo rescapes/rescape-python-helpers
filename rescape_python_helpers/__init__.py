@@ -43,18 +43,13 @@ from .functional.ramda import (
     to_array_if_not,
     group_by,
     tail,
-    unique
+    unique,
+    chain_with_obj_to_values
 )
 
 from .functional.memoize import memoize
 
 # Easy access ro all ramda and pyramda methods
-from .functional import ramda
+from .pyramda.iterable.map import r_map
+from .pyramda.iterable.filter import r_filter
 from .pyramda import *
-# Provide an alias so it's easy to import these
-from .pyramda import map as r_map, filter as r_filter
-
-__all__ = [
-    'functional',
-    'pyramda'
-]
