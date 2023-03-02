@@ -1,9 +1,9 @@
 from .isinstance import isinstance
 
 
-def isinstance_nocurry_test():
+def test_isinstance_nocurry():
     assert isinstance(str, "foo")
 
 
-def isinstance_curry_test():
+def test_isinstance_curry():
     assert isinstance(str)("foo")

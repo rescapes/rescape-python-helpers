@@ -1,7 +1,7 @@
 from .and_func import and_func
 
 
-def and_func_test():
+def test_and_func():
     assert and_func(True, True)
     assert not and_func(True, False)
     assert not and_func(False, True)

@@ -1,6 +1,6 @@
+from rescape_python_helpers.pyramda.private.asserts import assert_equal
 from .curry import *
-from .curry import CurrySpec
-from rescape_python_helpers.pyramda.private.asserts import assert_equal, assert_not_equal
+from ..private.curry_spec import CurrySpec
 
 
 def f(x, y, z=3):
@@ -20,12 +20,12 @@ def run_f_curry_cases(fc):
     assert_equal(fc(y=10)(1), 14)
 
 
-def curry_by_spec_test():
+def test_curry_by_spec():
     curry_spec = CurrySpec(['x', 'y', 'z'], {'z': 3})
     fc = curry_by_spec(curry_spec, f)
     run_f_curry_cases(fc)
 
 
-def curry_test():
+def test_curry():
     fc = curry(f)
     run_f_curry_cases(fc)

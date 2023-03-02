@@ -7,6 +7,6 @@ def f(x, y, z=3):
     return x + y + z
 
 
-def make_func_curry_spec_test():
+def test_make_func_curry_spec():
     f_spec = make_func_curry_spec(f)
     assert_equal(f_spec, CurrySpec(['x', 'y', 'z'], {'z': 3}))

@@ -14,7 +14,7 @@ def sub2(x):
     return x - 2
 
 
-def pipe_test():
+def test_pipe():
     piped = pipe(
         sub2,
         double,

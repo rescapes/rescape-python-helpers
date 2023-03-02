@@ -2,7 +2,7 @@ from .tap import tap
 from rescape_python_helpers.pyramda.private.asserts import assert_equal
 
 
-def tap_test():
+def test_tap():
     called_box = [False]
 
     def set_called(v):

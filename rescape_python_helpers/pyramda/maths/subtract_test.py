@@ -2,9 +2,9 @@ from .subtract import subtract
 from rescape_python_helpers.pyramda.private.asserts import assert_equal
 
 
-def subtract_nocurry_test():
+def test_subtract_nocurry():
     assert_equal(subtract(4, 3), 1)
 
 
-def subtract_curry_test():
+def test_subtract_curry():
     assert_equal(subtract(4)(3), 1)

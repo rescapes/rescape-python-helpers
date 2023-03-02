@@ -9,13 +9,13 @@ def negative(x):
     return x < 0
 
 
-def either_nocurry_test():
+def test_either_nocurry():
     assert either(positive, negative, -5)
     assert either(positive, negative, 5)
     assert not either(positive, negative, 0)
 
 
-def either_curry_test():
+def test_either_curry():
     nonzero = either(positive, negative)
     assert nonzero(-5)
     assert nonzero(5)

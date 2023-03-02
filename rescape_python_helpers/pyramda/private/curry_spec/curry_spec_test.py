@@ -10,11 +10,11 @@ def assert_isinstance(type, v):
     assert isinstance(v, type)
 
 
-def curry_spec_creation_test():
+def test_curry_spec_creation():
     assert_isinstance(CurrySpec, CurrySpec(['x', 'y', 'z'], {'y': 5}))
 
 
-def num_args_test():
+def test_num_args():
     two_posn_three_kwarg_arg_values = ArgValues(
         [1, 2],
         {'foo': 5, 'bar': 7, 'baz': 10}

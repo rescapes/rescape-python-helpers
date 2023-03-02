@@ -1,9 +1,9 @@
 from .equals import equals
 
 
-def equals_nocurry_test():
+def test_equals_nocurry():
     assert equals("foo", "foo")
 
 
-def equals_curry_test():
+def test_equals_curry():
     assert equals("foo")("foo")

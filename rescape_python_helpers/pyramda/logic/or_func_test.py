@@ -1,7 +1,7 @@
 from .or_func import or_func
 
 
-def or_func_test():
+def test_or_func():
     assert or_func(True, True)
     assert or_func(True, False)
     assert or_func(False, True)

@@ -15,10 +15,10 @@ expected_dict = {
 }
 
 
-def pick_nocurry_test():
+def test_pick_nocurry():
     assert_dicts_equal(pick(["b", "d"], test_dict), expected_dict)
 
 
-def pick_curry_test():
+def test_pick_curry():
     pickBD = pick(["b", "d"])
     assert_dicts_equal(pickBD(test_dict), expected_dict)

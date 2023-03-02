@@ -14,7 +14,7 @@ def sub2(x):
     return x - 2
 
 
-def compose_test():
+def test_compose():
     composed = compose(
         sub2,
         double,

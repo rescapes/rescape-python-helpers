@@ -13,12 +13,12 @@ pairs = [
 ]
 
 
-def contains_with_nocurry_test():
+def test_contains_with_nocurry():
     assert contains_with(pair_equal, (1, 2), pairs)
     assert not contains_with(pair_equal, (4, 3), pairs)
 
 
-def contains_with_nocurry_test():
+def test_contains_with_nocurry():
     contains_pair = contains_with(pair_equal)
     assert contains_pair((1, 2))(pairs)
     assert not contains_pair((4, 3))(pairs)

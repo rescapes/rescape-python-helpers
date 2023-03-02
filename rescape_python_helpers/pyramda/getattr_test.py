@@ -10,9 +10,9 @@ class TestObject:
 test_object = TestObject("foo")
 
 
-def getattr_nocurry_test():
+def test_getattr_nocurry():
     assert_equal(getattr("val", test_object), "foo")
 
 
-def getattr_curry_test():
+def test_getattr_curry():
     assert_equal(getattr("val")(test_object), "foo")

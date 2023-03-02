@@ -9,5 +9,5 @@ test_dict = {
 }
 
 
-def keys_test():
+def test_keys():
     assert_iterables_equal(keys(test_dict), set(["a", "c", "b"]))

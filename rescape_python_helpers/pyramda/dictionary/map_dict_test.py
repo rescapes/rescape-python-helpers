@@ -16,5 +16,5 @@ expected_dict = {
 }
 
 
-def map_dict_test():
+def test_map_dict():
     assert_dicts_equal(map_dict(inc, test_dict), expected_dict)

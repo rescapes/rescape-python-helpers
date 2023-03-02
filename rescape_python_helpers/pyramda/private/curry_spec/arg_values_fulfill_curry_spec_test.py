@@ -13,7 +13,7 @@ def f(x, y, z=3):
     return x + y + z
 
 
-def arg_values_fulfill_curry_spec_test():
+def test_arg_values_fulfill_curry_spec():
     f_spec = make_func_curry_spec(f)
     arg_values_fulfill_f_spec = wraps(arg_values_fulfill_curry_spec)(
         partial(arg_values_fulfill_curry_spec, f_spec)

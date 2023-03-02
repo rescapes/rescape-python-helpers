@@ -2,12 +2,12 @@ from .lesser import lesser
 from rescape_python_helpers.pyramda.private.asserts import assert_equal
 
 
-def lesser_nocurry_test():
+def test_lesser_nocurry():
     assert_equal(lesser(5, 3), 3)
     assert_equal(lesser(5, 7), 5)
 
 
-def lesser_curry_test():
+def test_lesser_curry():
     max5 = lesser(5)
     assert_equal(max5(3), 3)
     assert_equal(max5(7), 5)

@@ -1,6 +1,6 @@
 from functools import wraps, partial
+
 from rescape_python_helpers.pyramda.private.curry_spec import \
-    CurrySpec, \
     ArgValues, \
     make_func_curry_spec, \
     remove_args_from_curry_spec, \

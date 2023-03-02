@@ -1,3 +1,4 @@
+from .functional.memoize import memoize
 from .functional.ramda import (
     item_str_path,
     from_pairs,
@@ -44,12 +45,15 @@ from .functional.ramda import (
     group_by,
     tail,
     unique,
-    chain_with_obj_to_values
+    chain_with_obj_to_values,
+    when,
+    unless,
+    if_else,
+    init,
+    last,
+    unique_by
 )
-
-from .functional.memoize import memoize
-
+from .pyramda import *
+from .pyramda.iterable.filter import r_filter
 # Easy access ro all ramda and pyramda methods
 from .pyramda.iterable.map import r_map
-from .pyramda.iterable.filter import r_filter
-from .pyramda import *
